@@ -1,0 +1,2426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0f1e">
+<title>NiftyTrader — Juli</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1e;
+    --bg2: #111827;
+    --bg3: #1a2235;
+    --card: #141d2e;
+    --border: #1e2d45;
+    --accent: #00d4aa;
+    --accent2: #ff6b35;
+    --accent3: #7c3aed;
+    --gold: #f59e0b;
+    --red: #ef4444;
+    --green: #10b981;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #475569;
+    --mono: 'Space Mono', monospace;
+    --sans: 'Syne', sans-serif;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    background: linear-gradient(135deg, #0a0f1e 0%, #111827 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 18px 10px;
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(20px);
+  }
+  .header-row { display:flex; justify-content:space-between; align-items:center; }
+  .logo { font-size:20px; font-weight:800; letter-spacing:-0.5px; }
+  .logo span { color: var(--accent); }
+  .logo-sub { font-size:10px; color:var(--text3); letter-spacing:1px; margin-top:1px; }
+  .header-right { display:flex; align-items:center; gap:10px; }
+  .time-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text2);
+    background: var(--bg3);
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+  .time-badge b { color: var(--accent); }
+  .paper-pill {
+    font-size:10px; font-weight:700; letter-spacing:0.5px;
+    padding:3px 8px; border-radius:20px;
+    background:rgba(245,158,11,0.15); color:var(--gold);
+    border:1px solid rgba(245,158,11,0.3);
+  }
+
+  /* ─── TABS ─── */
+  .tabs {
+    display: flex;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display:none; }
+  .tab {
+    flex: 0 0 auto;
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-icon { margin-right: 4px; }
+
+  /* ─── PAGES ─── */
+  .page { display:none; padding: 14px; padding-bottom: 30px; }
+  .page.active { display:block; }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 12px;
+  }
+
+  /* ─── INPUTS ─── */
+  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .input-group { display: flex; flex-direction: column; gap: 5px; }
+  .input-group label { font-size: 10px; color: var(--text2); font-weight: 700; letter-spacing: 0.5px; }
+  .input-group input, .input-group select {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 11px 13px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 16px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+  }
+  .input-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,212,170,0.1); }
+  .input-group select { font-size: 13px; font-family: var(--sans); padding-right:30px; }
+
+  /* ─── BUTTONS ─── */
+  .btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), #00b896); color: #0a0f1e; }
+  .btn-primary:active { transform: scale(0.98); opacity:0.9; }
+  .btn-danger { background: linear-gradient(135deg, var(--red), #dc2626); color: white; }
+  .btn-gold { background: linear-gradient(135deg, var(--gold), #d97706); color: #0a0f1e; }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 10px;
+    font-size: 12px;
+  }
+  .btn-outline:active { background: var(--bg3); }
+  .btn-sm { padding: 9px 14px; font-size: 12px; width: auto; }
+  .btn-purple { background: linear-gradient(135deg, var(--accent3), #4f46e5); color: white; }
+
+  /* ─── GATE CHECKS ─── */
+  .gates { display: flex; flex-direction: column; gap: 8px; }
+  .gate {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    transition: all 0.3s;
+    animation: gateIn 0.4s ease both;
+  }
+  @keyframes gateIn {
+    from { opacity:0; transform: translateX(-10px); }
+    to   { opacity:1; transform: translateX(0); }
+  }
+  .gate-icon { font-size: 18px; flex-shrink:0; }
+  .gate-text { flex: 1; }
+  .gate-label { font-weight: 700; color: var(--text); font-size: 12px; }
+  .gate-val { color: var(--text2); font-size: 11px; font-family: var(--mono); margin-top:2px; }
+  .gate.pass { border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.06); }
+  .gate.fail { border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.06); }
+  .gate.warn { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.06); }
+
+  /* ─── STRATEGY RESULT ─── */
+  .strategy-result {
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+    border: 2px solid;
+    text-align: center;
+    animation: slideUp 0.4s ease;
+  }
+  @keyframes slideUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .strategy-result.go { border-color: var(--accent); background: rgba(0,212,170,0.07); }
+  .strategy-result.skip { border-color: var(--red); background: rgba(239,68,68,0.07); }
+  .strategy-result.caution { border-color: var(--gold); background: rgba(245,158,11,0.07); }
+  .strategy-result.pp-only { border-color: var(--accent3); background: rgba(124,58,237,0.07); }
+  .strategy-name { font-size: 22px; font-weight: 800; margin-bottom: 4px; letter-spacing:-0.5px; }
+  .strategy-sub { font-size: 12px; color: var(--text2); line-height:1.6; }
+
+  /* ─── TRADE CARD ─── */
+  .trade-card {
+    background: var(--bg3);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 12px;
+    animation: slideUp 0.5s ease;
+  }
+  .trade-card-header {
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .tc-ic { background: linear-gradient(135deg, var(--accent3), #4f46e5); }
+  .tc-ls { background: linear-gradient(135deg, var(--accent), #0369a1); color: #0a0f1e; }
+  .tc-bps { background: linear-gradient(135deg, var(--gold), #d97706); color: #0a0f1e; }
+  .tc-pp { background: linear-gradient(135deg, var(--accent3), #9333ea); }
+
+  .leg-row {
+    display: flex;
+    align-items: center;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+  }
+  .leg-row:last-child { border-bottom: none; }
+  .leg-badge {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    display: flex; align-items:center; justify-content:center;
+    font-size: 10px; font-weight: 800; letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  .leg-badge.buy { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+  .leg-badge.sell { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .leg-info { flex:1; }
+  .leg-strike { font-family: var(--mono); font-size: 17px; font-weight: 700; }
+  .leg-desc { font-size: 11px; color: var(--text3); margin-top:1px; }
+  .leg-price { font-family: var(--mono); font-size: 14px; color: var(--text2); font-weight:700; }
+  .leg-price-label { font-size:9px; color:var(--text3); text-align:right; }
+
+  /* ─── FINANCIALS ─── */
+  .financials {
+    padding: 14px 16px;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+  }
+  .fin-row { display:flex; justify-content:space-between; align-items:center; padding:5px 0; }
+  .fin-label { font-size:12px; color:var(--text2); }
+  .fin-value { font-family:var(--mono); font-size:14px; font-weight:700; }
+  .fin-value.green { color:var(--green); }
+  .fin-value.gold { color:var(--gold); }
+  .fin-value.red { color:var(--red); }
+  .fin-value.accent { color:var(--accent); }
+  .fin-divider { height:1px; background:var(--border); margin:6px 0; }
+
+  /* ─── STATS GRID ─── */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 11px;
+    text-align: center;
+  }
+  .stat-label { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .stat-value { font-family: var(--mono); font-size: 15px; font-weight: 700; }
+  .stat-value.green { color: var(--green); }
+  .stat-value.red { color: var(--red); }
+  .stat-value.gold { color: var(--gold); }
+  .stat-value.accent { color: var(--accent); }
+
+  /* ─── VIX METER ─── */
+  .vix-meter { position: relative; margin: 8px 0 16px; }
+  .vix-bar {
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #10b981 0%, #10b981 28%, #f59e0b 50%, #ef4444 75%, #7c3aed 100%);
+    position: relative;
+  }
+  .vix-cursor {
+    position: absolute;
+    top: -5px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid var(--bg);
+    transform: translateX(-50%);
+    transition: left 0.6s cubic-bezier(0.34,1.56,0.64,1);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.6);
+  }
+  .vix-labels { display:flex; justify-content:space-between; margin-top:4px; font-size:9px; color:var(--text3); font-family:var(--mono); }
+
+  /* ─── CLOCK ─── */
+  .clock-row { display:flex; gap:8px; margin-bottom:12px; }
+  .clock-box {
+    flex:1; background:var(--bg3); border:1px solid var(--border);
+    border-radius:var(--radius-sm); padding:10px 12px; text-align:center;
+  }
+  .clock-label { font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+  .clock-time { font-family:var(--mono); font-size:20px; font-weight:700; color:var(--accent); }
+  .clock-zone { font-size:9px; color:var(--text3); margin-top:1px; }
+  .market-status { font-size:11px; margin-top:4px; font-weight:600; }
+  .market-open { color:var(--green); }
+  .market-closed { color:var(--red); }
+  .market-wait { color:var(--gold); }
+  .market-entry { color:var(--accent); }
+
+  /* ─── MARKET PHASE BANNER ─── */
+  .phase-banner {
+    border-radius:var(--radius-sm); padding:10px 14px;
+    font-size:12px; font-weight:700; letter-spacing:0.3px;
+    display:flex; align-items:center; gap:8px;
+    margin-bottom:12px;
+  }
+  .phase-entry { background:rgba(0,212,170,0.1); border:1px solid rgba(0,212,170,0.3); color:var(--accent); }
+  .phase-wait  { background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); color:var(--gold); }
+  .phase-closed { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:var(--red); }
+  .phase-pre { background:rgba(148,163,184,0.1); border:1px solid rgba(148,163,184,0.2); color:var(--text2); }
+  .pulse { animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+  /* ─── PP SIGNAL ─── */
+  .pp-signal {
+    border-radius:var(--radius-sm); padding:12px 14px;
+    font-size:13px; font-weight:700; margin-bottom:10px;
+    display:flex; align-items:flex-start; gap:8px; flex-direction:column;
+  }
+  .pp-row { display:flex; align-items:center; gap:8px; }
+  .pp-sub { font-size:11px; font-weight:400; color:inherit; opacity:0.85; margin-top:4px; line-height:1.6; }
+  .pp-best   { background:rgba(16,185,129,0.1);  border:1px solid rgba(16,185,129,0.3);  color:var(--green); }
+  .pp-good   { background:rgba(0,212,170,0.1);   border:1px solid rgba(0,212,170,0.3);   color:var(--accent); }
+  .pp-ok     { background:rgba(245,158,11,0.1);  border:1px solid rgba(245,158,11,0.3);  color:var(--gold); }
+  .pp-wait   { background:rgba(239,68,68,0.1);   border:1px solid rgba(239,68,68,0.3);   color:var(--red); }
+  .pp-urgent { background:rgba(124,58,237,0.1);  border:1px solid rgba(124,58,237,0.3);  color:#a78bfa; }
+
+  /* ─── JOURNAL ─── */
+  .trade-entry {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 13px;
+    margin-bottom: 8px;
+    animation: slideUp 0.3s ease;
+  }
+  .trade-entry-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:7px; }
+  .trade-entry-date { font-size:10px; color:var(--text3); font-family:var(--mono); }
+  .trade-entry-strategy { font-size:14px; font-weight:800; }
+  .trade-entry-pnl { font-family:var(--mono); font-size:17px; font-weight:700; }
+  .pnl-pos { color:var(--green); }
+  .pnl-neg { color:var(--red); }
+  .pnl-open { color:var(--gold); }
+  .trade-entry-notes { font-size:11px; color:var(--text2); line-height:1.5; margin-top:6px; }
+  .trade-entry-meta { display:flex; gap:6px; margin-top:7px; flex-wrap:wrap; }
+
+  /* ─── SETTINGS ─── */
+  .setting-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 13px 0; border-bottom: 1px solid var(--border);
+  }
+  .setting-row:last-child { border-bottom:none; }
+  .setting-label { font-size:13px; font-weight:700; }
+  .setting-sub { font-size:10px; color:var(--text2); margin-top:2px; }
+  .setting-input {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px;
+    color: var(--text); font-family: var(--mono); font-size:13px;
+    width: 130px; text-align:right; outline:none;
+    transition: border-color 0.2s;
+  }
+  .setting-input:focus { border-color:var(--accent); }
+
+  /* ─── TOGGLE ─── */
+  .toggle { position:relative; width:44px; height:24px; flex-shrink:0; }
+  .toggle input { opacity:0; width:0; height:0; }
+  .toggle-slider {
+    position:absolute; inset:0;
+    background:var(--bg3); border-radius:24px; cursor:pointer;
+    border:1px solid var(--border); transition:0.3s;
+  }
+  .toggle-slider:before {
+    content:''; position:absolute;
+    width:18px; height:18px; border-radius:50%;
+    background:var(--text2); top:2px; left:2px; transition:0.3s;
+  }
+  .toggle input:checked + .toggle-slider { background:var(--accent); border-color:var(--accent); }
+  .toggle input:checked + .toggle-slider:before { transform:translateX(20px); background:white; }
+
+  /* ─── AI ─── */
+  .ai-response {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--text);
+    white-space: pre-wrap;
+    font-family: var(--mono);
+    margin-bottom: 12px;
+    max-height: 55vh;
+    overflow-y: auto;
+  }
+  .ai-thinking {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px;
+    color: var(--text2);
+    font-size: 13px;
+  }
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ─── POSITION TRACKER ─── */
+  .distance-bar {
+    height:6px; background:var(--bg); border-radius:3px; overflow:hidden; margin-top:6px;
+  }
+  .distance-fill {
+    height:100%; border-radius:3px; transition: width 0.5s, background 0.5s;
+  }
+
+  /* ─── REFERENCE CARDS ─── */
+  .ref-section { margin-bottom:12px; }
+  .ref-title {
+    font-size:14px; font-weight:800; margin-bottom:10px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .ref-rule {
+    display:flex; align-items:flex-start; gap:8px;
+    padding:8px 10px; border-radius:8px;
+    background:var(--bg3); border:1px solid var(--border);
+    font-size:12px; line-height:1.6; margin-bottom:6px;
+  }
+  .ref-rule-icon { flex-shrink:0; font-size:14px; margin-top:1px; }
+  .ref-formula {
+    font-family:var(--mono); font-size:11px;
+    background:var(--bg3); border:1px solid var(--border);
+    border-radius:8px; padding:12px; line-height:2; margin:8px 0;
+    color:var(--text2);
+  }
+  .ref-formula b { color:var(--accent); }
+
+  /* ─── MISC ─── */
+  .divider { height:1px; background:var(--border); margin: 12px 0; }
+  .tag {
+    display:inline-block; padding:3px 9px; border-radius:20px;
+    font-size:10px; font-weight:700; letter-spacing:0.5px;
+  }
+  .tag-green { background:rgba(16,185,129,0.15); color:var(--green); border:1px solid rgba(16,185,129,0.2); }
+  .tag-red { background:rgba(239,68,68,0.15); color:var(--red); border:1px solid rgba(239,68,68,0.2); }
+  .tag-gold { background:rgba(245,158,11,0.15); color:var(--gold); border:1px solid rgba(245,158,11,0.2); }
+  .tag-accent { background:rgba(0,212,170,0.15); color:var(--accent); border:1px solid rgba(0,212,170,0.2); }
+  .tag-purple { background:rgba(124,58,237,0.15); color:#a78bfa; border:1px solid rgba(124,58,237,0.2); }
+
+  .empty-state { text-align:center; padding:40px 20px; color:var(--text3); }
+  .empty-icon { font-size:40px; margin-bottom:10px; }
+  .empty-text { font-size:13px; line-height:1.6; }
+
+  .row { display:flex; gap:8px; }
+  .row .btn { flex:1; }
+
+  .section-title {
+    font-size:10px; font-weight:700; letter-spacing:1.5px;
+    text-transform:uppercase; color:var(--accent);
+    margin-bottom:10px;
+  }
+
+  .warning-banner {
+    background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3);
+    border-radius:var(--radius-sm); padding:10px 12px;
+    font-size:12px; color:var(--red); font-weight:600;
+    display:flex; align-items:center; gap:8px; margin-bottom:10px;
+  }
+
+  .success-banner {
+    background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3);
+    border-radius:var(--radius-sm); padding:10px 12px;
+    font-size:12px; color:var(--green); font-weight:600;
+    display:flex; align-items:center; gap:8px; margin-bottom:10px;
+  }
+
+  .routine-card {
+    background:var(--bg3); border:1px solid var(--border);
+    border-radius:var(--radius-sm); padding:12px;
+  }
+  .routine-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:5px 0; border-bottom:1px solid rgba(30,45,69,0.7);
+    font-size:12px;
+  }
+  .routine-row:last-child { border-bottom:none; }
+  .routine-time { font-family:var(--mono); font-size:11px; color:var(--accent); }
+  .routine-action { color:var(--text2); font-size:11px; }
+  .routine-current { background:rgba(0,212,170,0.07); border-radius:6px; padding:3px 6px; margin:-3px -6px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-row">
+    <div>
+      <div class="logo">Nifty<span>Trader</span></div>
+      <div class="logo-sub">JULI'S NSE SYSTEM</div>
+    </div>
+    <div class="header-right">
+      <div class="paper-pill" id="modePill">📄 PAPER</div>
+      <div class="time-badge" id="headerTime">--:-- --</div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('setup')" id="tab-setup"><span class="tab-icon">📊</span>Setup</div>
+  <div class="tab" onclick="switchTab('ai')" id="tab-ai"><span class="tab-icon">🤖</span>AI</div>
+  <div class="tab" onclick="switchTab('position')" id="tab-position"><span class="tab-icon">📈</span>Position</div>
+  <div class="tab" onclick="switchTab('journal')" id="tab-journal"><span class="tab-icon">📓</span>Journal</div>
+  <div class="tab" onclick="switchTab('refs')" id="tab-refs"><span class="tab-icon">📚</span>Refs</div>
+  <div class="tab" onclick="switchTab('settings')" id="tab-settings"><span class="tab-icon">⚙️</span>Settings</div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: SETUP -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page active" id="page-setup">
+
+  <!-- Clock -->
+  <div class="clock-row">
+    <div class="clock-box">
+      <div class="clock-label">Dubai GST</div>
+      <div class="clock-time" id="dubaiTime">--:--</div>
+      <div class="clock-zone">UTC+4</div>
+      <div class="market-status" id="dubaiStatus">--</div>
+    </div>
+    <div class="clock-box">
+      <div class="clock-label">India IST</div>
+      <div class="clock-time" id="istTime">--:--</div>
+      <div class="clock-zone">UTC+5:30</div>
+      <div class="market-status" id="istStatus">--</div>
+    </div>
+  </div>
+
+  <!-- Phase Banner -->
+  <div id="phaseBanner"></div>
+
+  <!-- Market Inputs -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="card-title" style="margin-bottom:0;">Market Data</div>
+      <button class="btn btn-outline btn-sm" onclick="fetchLiveData()" id="fetchBtn"
+        style="padding:8px 12px;font-size:11px;display:flex;align-items:center;gap:5px;">
+        <span id="fetchIcon">🔄</span><span id="fetchLabel">Fetch Live</span>
+      </button>
+    </div>
+
+    <div id="fetchStatus" style="display:none;margin-bottom:10px;padding:8px 12px;
+         border-radius:var(--radius-sm);font-size:11px;font-family:var(--mono);"></div>
+    <div id="lastUpdated" style="display:none;font-size:9px;color:var(--text3);
+         font-family:var(--mono);margin-bottom:10px;text-align:right;"></div>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label>NIFTY 50</label>
+        <input type="number" id="niftyInput" placeholder="24350" inputmode="decimal" oninput="onNiftyChange()">
+      </div>
+      <div class="input-group">
+        <label>INDIA VIX</label>
+        <input type="number" id="vixInput" placeholder="16.18" inputmode="decimal" step="0.01" oninput="onVixChange()">
+      </div>
+      <div class="input-group">
+        <label>PREV CLOSE</label>
+        <input type="number" id="prevClose" placeholder="24230" inputmode="decimal">
+      </div>
+      <div class="input-group">
+        <label>LOT SIZE</label>
+        <input type="number" id="lotSize" placeholder="65" inputmode="numeric" value="65">
+      </div>
+    </div>
+
+    <!-- Gap indicator -->
+    <div id="gapIndicator" style="display:none;margin-top:8px;"></div>
+
+    <!-- VIX Meter -->
+    <div style="margin-top:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:10px;color:var(--text3);font-weight:700;letter-spacing:0.5px;">VIX ZONE</span>
+        <span class="tag" id="vixTag" style="font-size:10px;">--</span>
+      </div>
+      <div class="vix-meter">
+        <div class="vix-bar">
+          <div class="vix-cursor" id="vixCursor" style="left:50%"></div>
+        </div>
+        <div class="vix-labels">
+          <span>8</span><span>14</span><span>16</span><span>18</span><span>20</span><span>29</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:8px;">
+      <div class="input-group">
+        <label>EXPIRY DATE</label>
+        <select id="expirySelect">
+          <option value="">Select expiry...</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="margin-top:8px;">
+      <div class="input-group">
+        <label>VIX DIRECTION</label>
+        <select id="vixDirection">
+          <option value="stable">Stable / Unclear</option>
+          <option value="falling">Falling ↓ (good)</option>
+          <option value="rising">Rising ↑ (caution)</option>
+          <option value="rising_sharp">Rising Sharply ↑↑ (WAIT)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gate Checks (hidden until analyze) -->
+  <div class="card" id="gatesCard" style="display:none;">
+    <div class="card-title">Pre-Trade Gate Checks</div>
+    <div class="gates" id="gatesContainer"></div>
+  </div>
+
+  <!-- Strategy Result -->
+  <div id="strategyResult" style="display:none;"></div>
+
+  <!-- Trade Card -->
+  <div id="tradeCardContainer" style="display:none;"></div>
+
+  <!-- PP Signal -->
+  <div id="ppSignal" style="display:none;"></div>
+
+  <!-- Daily Routine -->
+  <div id="routineCard" style="display:none;"></div>
+
+  <!-- Buttons -->
+  <button class="btn btn-primary" onclick="analyzeSetup()" id="analyzeBtn" style="margin-top:4px;">
+    ⚡ ANALYZE SETUP
+  </button>
+
+  <div class="row" style="margin-top:8px;" id="actionBtns" style="display:none;">
+    <button class="btn btn-outline btn-sm" onclick="switchTab('ai')">🤖 Ask AI</button>
+    <button class="btn btn-outline btn-sm" onclick="openAddTrade()">➕ Log Trade</button>
+    <button class="btn btn-outline btn-sm" onclick="activatePosition()">📌 Track</button>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: AI ANALYSIS -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-ai">
+
+  <div class="card">
+    <div class="card-title">Ask Claude AI</div>
+    <div id="apiKeyWarning" style="display:none;" class="warning-banner">
+      ⚠️ No API key set — go to Settings tab to add your Claude API key
+    </div>
+    <div class="input-group" style="margin-bottom:10px;">
+      <label>YOUR QUESTION</label>
+      <textarea id="aiQuestion"
+        style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);
+               padding:12px;color:var(--text);font-family:var(--sans);font-size:13px;
+               width:100%;min-height:80px;outline:none;resize:none;line-height:1.5;transition:border-color 0.2s;"
+        placeholder="What strategy should I use today? VIX is 16.18, Nifty is 24350..."
+        onfocus="this.style.borderColor='var(--accent)'"
+        onblur="this.style.borderColor='var(--border)'"></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="askClaude()" id="aiBtn">🤖 GET AI ANALYSIS</button>
+  </div>
+
+  <!-- Quick prompts -->
+  <div class="card">
+    <div class="card-title">Quick Prompts</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <button class="btn btn-outline btn-sm" onclick="quickPrompt('go_nogo')">GO/NO-GO?</button>
+      <button class="btn btn-outline btn-sm" onclick="quickPrompt('strikes')">Calculate Strikes</button>
+      <button class="btn btn-outline btn-sm" onclick="quickPrompt('pp_check')">PP Signal?</button>
+      <button class="btn btn-outline btn-sm" onclick="quickPrompt('exit_check')">Exit Position?</button>
+      <button class="btn btn-outline btn-sm" onclick="quickPrompt('vix_analysis')">VIX Analysis</button>
+      <button class="btn btn-outline btn-sm" onclick="quickPrompt('weekly_plan')">Weekly Plan</button>
+    </div>
+  </div>
+
+  <!-- AI Response -->
+  <div id="aiThinking" style="display:none;">
+    <div class="ai-thinking">
+      <div class="spinner"></div>
+      <span>Claude is analyzing your setup...</span>
+    </div>
+  </div>
+
+  <div id="aiResponseContainer" style="display:none;">
+    <div class="card-title" style="margin-bottom:8px;">AI RESPONSE</div>
+    <div class="ai-response" id="aiResponse"></div>
+    <div class="row">
+      <button class="btn btn-outline btn-sm" onclick="copyAiResponse()">📋 Copy</button>
+      <button class="btn btn-outline btn-sm" onclick="clearAiResponse()">🗑️ Clear</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: POSITION TRACKER -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-position">
+
+  <div id="noPosition" class="empty-state">
+    <div class="empty-icon">📭</div>
+    <div class="empty-text">No open position<br>Analyze a setup and hit Track</div>
+    <button class="btn btn-outline btn-sm" style="margin-top:14px;width:auto;padding:10px 20px;" onclick="switchTab('setup')">
+      Go to Setup →
+    </button>
+  </div>
+
+  <div id="positionTracker" style="display:none;">
+
+    <div class="card">
+      <div class="card-title">Open Position</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div>
+          <div style="font-size:20px;font-weight:800;" id="posStrategy">--</div>
+          <div style="font-size:11px;color:var(--text2);" id="posExpiry">Expiry: --</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:9px;color:var(--text3);margin-bottom:2px;">ENTRY NIFTY</div>
+          <div style="font-family:var(--mono);font-size:16px;font-weight:700;" id="posEntryNifty">--</div>
+          <div style="font-size:9px;color:var(--text3);margin-top:2px;" id="posEntryVix">VIX --</div>
+        </div>
+      </div>
+
+      <div class="input-group" style="margin-bottom:10px;">
+        <label>CURRENT P&L (₹) — enter from Sensibull</label>
+        <input type="number" id="currentPnl" placeholder="e.g. 1850 or -2300"
+               inputmode="decimal" oninput="updatePnlTracker()">
+      </div>
+
+      <div class="stats-grid" id="pnlStats">
+        <div class="stat-box">
+          <div class="stat-label">Max Profit</div>
+          <div class="stat-value green" id="statMaxProfit">₹--</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">50% Target ✅</div>
+          <div class="stat-value accent" id="statTarget">₹--</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Stop Loss 🔴</div>
+          <div class="stat-value red" id="statStop">₹--</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Progress</div>
+          <div class="stat-value gold" id="statProgress">--%</div>
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;">
+          <div id="progressBar" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--green));width:0%;transition:width 0.5s;border-radius:4px;"></div>
+        </div>
+        <div id="pnlAlert" style="margin-top:8px;"></div>
+      </div>
+    </div>
+
+    <!-- Strike Distance -->
+    <div class="card">
+      <div class="card-title">Strike Distance Monitor</div>
+      <div class="input-group" style="margin-bottom:10px;">
+        <label>CURRENT NIFTY (live)</label>
+        <input type="number" id="currentNifty" placeholder="Enter current Nifty" inputmode="decimal" oninput="updateDistances()">
+      </div>
+      <div id="distanceContainer"></div>
+    </div>
+
+    <!-- Position Legs -->
+    <div class="card">
+      <div class="card-title">Position Legs</div>
+      <div id="posLegs"></div>
+    </div>
+
+    <button class="btn btn-danger" onclick="closePosition()">🔴 CLOSE POSITION</button>
+
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: JOURNAL -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-journal">
+
+  <div class="stats-grid" style="margin-bottom:12px;">
+    <div class="stat-box">
+      <div class="stat-label">Total Trades</div>
+      <div class="stat-value accent" id="jTotalTrades">0</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Net P&L</div>
+      <div class="stat-value" id="jNetPnl">₹0</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Win Rate</div>
+      <div class="stat-value gold" id="jWinRate">--%</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Best Trade</div>
+      <div class="stat-value green" id="jBestTrade">₹0</div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" onclick="openAddTrade()" style="margin-bottom:12px;">
+    ➕ LOG NEW TRADE
+  </button>
+
+  <div class="section-title">MY TRADES</div>
+  <div id="journalList"></div>
+
+  <div class="divider"></div>
+  <div class="section-title">📚 PAPER TRADE HISTORY</div>
+  <div id="historicalTrades"></div>
+
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: REFERENCES -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-refs">
+
+  <!-- Iron Condor -->
+  <div class="card">
+    <div class="ref-title"><span>🏗️</span> Iron Condor</div>
+    <div class="tag tag-accent" style="margin-bottom:10px;">VIX 16–18 ✅ Core Strategy</div>
+    <div class="ref-formula">
+<b>OTM %</b> = 1.8% (VIX 16-17)  |  2.0% (VIX 17-18)
+<br>
+<b>SELL PE</b> = Nifty × (1 - OTM%) → round to 50
+<b>BUY  PE</b> = SELL PE − 500
+<b>SELL CE</b> = Nifty × (1 + OTM%) → round to 50
+<b>BUY  CE</b> = SELL CE + 500
+<br>
+✅ Must satisfy: SELL PE &lt; Nifty &lt; SELL CE
+    </div>
+    <div class="ref-rule"><span class="ref-rule-icon">✅</span><span>Sensibull must show "GET" (credit received)</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">✅</span><span>Exit at 50% of max credit received</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">✅</span><span>Stop loss = 2× credit received</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">✅</span><span>Both breakevens must be &gt;1.5% from Nifty</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">❌</span><span>Never enter on Thursday (expiry day)</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">❌</span><span>Never enter before 10:30 AM IST (9:00 AM Dubai)</span></div>
+  </div>
+
+  <!-- Long Strangle -->
+  <div class="card">
+    <div class="ref-title"><span>↔️</span> Long Strangle</div>
+    <div class="tag tag-green" style="margin-bottom:10px;">VIX &lt; 16 | Buy Premium</div>
+    <div class="ref-formula">
+<b>Distance</b> = 1.5% from Nifty (both sides)
+<br>
+<b>BUY PE</b> = Nifty × (1 - 1.5%) → round to 50
+<b>BUY CE</b> = Nifty × (1 + 1.5%) → round to 50
+<br>
+⚠️ Both legs MUST cost &lt; ₹150 each
+   If either &gt; ₹150 → go further OTM
+    </div>
+    <div class="ref-rule"><span class="ref-rule-icon">✅</span><span>Profit if Nifty moves &gt;1.5% either direction</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">✅</span><span>Best when big move expected (budget, results, etc.)</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">❌</span><span>Never buy when VIX &gt; 17 — premiums too expensive</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">❌</span><span>Never pay &gt; ₹150 per leg — break-even too far</span></div>
+  </div>
+
+  <!-- Bull Put Spread -->
+  <div class="card">
+    <div class="ref-title"><span>🐂</span> Bull Put Spread</div>
+    <div class="tag tag-gold" style="margin-bottom:10px;">VIX 18–20 | Caution Mode</div>
+    <div class="ref-formula">
+<b>SELL PE</b> = Nifty × (1 - 2.5%) → round to 50
+<b>BUY  PE</b> = SELL PE − 300
+<br>
+✅ Net credit must be &gt; ₹40/share minimum
+    </div>
+    <div class="ref-rule"><span class="ref-rule-icon">✅</span><span>Defined risk — max loss is width × lot size</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">✅</span><span>Only trade when bullish bias on Nifty</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">❌</span><span>Skip if market trending down sharply</span></div>
+  </div>
+
+  <!-- Protective Put -->
+  <div class="card">
+    <div class="ref-title"><span>🛡️</span> Protective Put</div>
+    <div class="tag tag-purple" style="margin-bottom:10px;">Portfolio Insurance | 2 Lots</div>
+    <div class="ref-formula">
+<b>BUY  PE</b> = Nearest 500 below Nifty (e.g. 23,000)
+<b>SELL PE</b> = BUY PE − 1000 (e.g. 22,000)
+<b>Lots</b>   = 2 (covers ~₹30L portfolio)
+<b>Expiry</b> = Sep 2026 (132 days) preferred
+<br>
+Est. cost: ₹180-220/share = ~₹23,400 total
+Daily cost = ₹177/day | Monthly = ₹5,300
+    </div>
+    <div class="ref-rule"><span class="ref-rule-icon">🟢</span><span><b>BEST TIME TO BUY:</b> VIX &lt; 14 (cheapest insurance!)</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">🟢</span><span>Good: VIX 14–16 (reasonable premiums)</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">🟡</span><span>Acceptable: VIX 16–17 (slightly elevated)</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">🔴</span><span>Too expensive: VIX 17–20 — wait for dip</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">🚨</span><span><b>URGENT OVERRIDE:</b> VIX &gt; 20 — buy regardless!</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">⚠️</span><span>This is OPPOSITE to income trades — buy when VIX LOW</span></div>
+  </div>
+
+  <!-- Daily Routine -->
+  <div class="card">
+    <div class="ref-title"><span>⏰</span> Daily Routine</div>
+    <div class="routine-card" id="routineRef"></div>
+  </div>
+
+  <!-- Lessons -->
+  <div class="card">
+    <div class="ref-title"><span>🎓</span> Lessons (From Real Losses)</div>
+    <div class="ref-rule"><span class="ref-rule-icon">❌</span><span>Never enter before 9:00 AM Dubai (10:30 AM IST) — May 12 cost ₹10-15K extra</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">❌</span><span>Never buy options when VIX &gt; 17 — May 13 bought PE @ ₹311 → -₹10,842</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">❌</span><span>Never pay &gt; ₹150 per leg for Long Strangle</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">❌</span><span>Never hold positions into weekend without stop</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">❌</span><span>Never sell ITM options — Sensibull must show "GET" not "PAY"</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">✅</span><span>Always exit at 50% profit — no exceptions</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">✅</span><span>Always use 2x credit as stop loss</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">✅</span><span>Always verify Sensibull shows tent-shaped payoff</span></div>
+    <div class="ref-rule"><span class="ref-rule-icon">✅</span><span>Always check both breakevens &gt;1.5% away</span></div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: SETTINGS -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-settings">
+
+  <div class="card">
+    <div class="card-title">API Configuration</div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Claude API Key</div>
+        <div class="setting-sub">From console.anthropic.com</div>
+      </div>
+    </div>
+    <div class="input-group" style="margin-bottom:6px;">
+      <input type="password" id="apiKey" placeholder="sk-ant-..." style="font-size:13px;" oninput="saveSettings()">
+    </div>
+    <div id="apiKeyStatus" style="font-size:11px;color:var(--text3);margin-bottom:12px;font-family:var(--mono);"></div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">AI Model</div>
+        <div class="setting-sub">Sonnet 4 recommended</div>
+      </div>
+      <select class="setting-input" id="aiModel" onchange="saveSettings()" style="width:150px;font-size:12px;">
+        <option value="claude-sonnet-4-20250514">Sonnet 4</option>
+        <option value="claude-haiku-4-5-20251001">Haiku 4.5</option>
+        <option value="claude-opus-4-20250514">Opus 4</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Trading Profile</div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Default Lot Size</div>
+        <div class="setting-sub">Nifty = 65 shares</div>
+      </div>
+      <input type="number" class="setting-input" id="settingLot" value="65" oninput="saveSettings()">
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Portfolio Value (₹)</div>
+        <div class="setting-sub">For PP calculation</div>
+      </div>
+      <input type="number" class="setting-input" id="settingPortfolio" value="3041058" oninput="saveSettings()">
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Wing Width (pts)</div>
+        <div class="setting-sub">500 = recommended for IC</div>
+      </div>
+      <input type="number" class="setting-input" id="settingWing" value="500" oninput="saveSettings()">
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Paper Trade Mode</div>
+        <div class="setting-sub">Disable for live trading</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="paperMode" checked onchange="saveSettings()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Trading Rules Reminder</div>
+    <div style="font-size:11px;line-height:2.0;color:var(--text2);font-family:var(--mono);">
+      ❌ Never enter before 9:00 AM Dubai<br>
+      ❌ Never buy options when VIX &gt; 17<br>
+      ❌ Never pay &gt; ₹150 per strangle leg<br>
+      ❌ Never hold into weekend<br>
+      ❌ Never sell ITM options<br>
+      ✅ Always exit at 50% profit<br>
+      ✅ Always use 2x credit as stop<br>
+      ✅ Sensibull must show "GET"<br>
+      ✅ PP: buy when VIX LOW (&lt; 16)
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Data Management</div>
+    <div class="row">
+      <button class="btn btn-outline btn-sm" onclick="exportData()">📤 Export CSV</button>
+      <button class="btn btn-danger btn-sm" onclick="clearAllData()">🗑️ Clear All</button>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:20px;color:var(--text3);font-size:10px;font-family:var(--mono);">
+    NiftyTrader v1.1 — Juli's Trading System<br>
+    Dubai GST | Nifty 50 Options | PWA Ready<br>
+    Samsung Galaxy Tab A11
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- ADD TRADE MODAL -->
+<!-- ══════════════════════════════════════════ -->
+<div id="modalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;padding:16px;overflow-y:auto;">
+  <div style="background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:18px;max-width:500px;margin:20px auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div style="font-size:15px;font-weight:800;">Log Trade</div>
+      <button onclick="closeModal()" style="background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer;line-height:1;">✕</button>
+    </div>
+
+    <div class="input-group" style="margin-bottom:10px;">
+      <label>DATE</label>
+      <input type="date" id="tradeDate" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text);font-size:14px;width:100%;outline:none;">
+    </div>
+    <div class="input-group" style="margin-bottom:10px;">
+      <label>STRATEGY</label>
+      <select id="tradeStrategy" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;color:var(--text);font-size:13px;width:100%;outline:none;">
+        <option>Iron Condor</option>
+        <option>Long Strangle</option>
+        <option>Bull Put Spread</option>
+        <option>Protective Put</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="input-grid" style="margin-bottom:10px;">
+      <div class="input-group">
+        <label>ENTRY NIFTY</label>
+        <input type="number" id="tradeEntryNifty" placeholder="24350" inputmode="decimal">
+      </div>
+      <div class="input-group">
+        <label>ENTRY VIX</label>
+        <input type="number" id="tradeEntryVix" placeholder="16.18" inputmode="decimal">
+      </div>
+      <div class="input-group">
+        <label>CREDIT/DEBIT (₹)</label>
+        <input type="number" id="tradeCredit" placeholder="7400" inputmode="decimal">
+      </div>
+      <div class="input-group">
+        <label>EXPIRY</label>
+        <input type="date" id="tradeExpiry">
+      </div>
+    </div>
+    <div class="input-group" style="margin-bottom:10px;">
+      <label>FINAL P&L (₹) — leave blank if open</label>
+      <input type="number" id="tradePnl" placeholder="3200 or -5000" inputmode="decimal">
+    </div>
+    <div class="input-group" style="margin-bottom:16px;">
+      <label>NOTES</label>
+      <textarea id="tradeNotes"
+        style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);
+               padding:12px;color:var(--text);font-size:12px;width:100%;min-height:60px;outline:none;resize:none;font-family:var(--sans);"
+        placeholder="Any observations, mistakes, lessons..."></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="saveTrade()">💾 SAVE TRADE</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SCRIPT ENGINE -->
+<!-- ══════════════════════════════════════════ -->
+<script>
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let state = {
+  currentTab: 'setup',
+  openPosition: null,
+  lastAnalysis: null,
+  trades: [],
+  settings: {
+    apiKey: '',
+    aiModel: 'claude-sonnet-4-20250514',
+    lotSize: 65,
+    portfolio: 3041058,
+    wingWidth: 500,
+    paperMode: true
+  }
+};
+
+const HISTORICAL = [
+  { date:'2026-05-12', strategy:'Long Strangle', entryNifty:23500, entryVix:17.2, pnl:4599, credit:0, expiry:'2026-05-15', notes:'Won despite 7:58AM Dubai entry ❌. Both legs profitable anyway!', lesson:'Won despite bad entry' },
+  { date:'2026-05-13', strategy:'Long Strangle', entryNifty:23600, entryVix:19.0, pnl:-9435, credit:0, expiry:'2026-05-15', notes:'VIX 19 ❌ — PE bought @ ₹311, far too expensive. Classic high-VIX mistake.', lesson:'Never buy high VIX' },
+  { date:'2026-05-19', strategy:'Long Strangle', entryNifty:23450, entryVix:16.5, pnl:5853, credit:0, expiry:'2026-05-22', notes:'Both legs expired ITM! Perfect strangle entry ✅', lesson:'Both legs ITM — perfect!' },
+  { date:'2026-05-20', strategy:'Iron Condor', entryNifty:23627, entryVix:18.7, pnl:3200, credit:7400, expiry:'2026-05-22', notes:'First correct IC entry at 10:22AM IST ✅. Exited at 43% profit.', lesson:'First correct IC!' }
+];
+
+// NSE expiry Thursdays 2026
+const EXPIRY_DATES = [
+  '2026-06-05','2026-06-12','2026-06-19','2026-06-26',
+  '2026-07-02','2026-07-09','2026-07-16','2026-07-23','2026-07-30',
+  '2026-08-06','2026-08-13','2026-08-20','2026-08-27',
+  '2026-09-03','2026-09-10','2026-09-17','2026-09-24','2026-09-29',
+  '2026-10-01','2026-10-08','2026-10-15','2026-10-22','2026-10-29',
+  '2026-11-05','2026-11-12','2026-11-19','2026-11-26',
+  '2026-12-03','2026-12-10','2026-12-17','2026-12-24','2026-12-29'
+];
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+function init() {
+  loadSettings();
+  loadTrades();
+  startClock();
+  renderHistorical();
+  updateJournalStats();
+  populateExpiryDates();
+  setDefaultDate();
+  buildRoutine();
+  checkApiKeyStatus();
+}
+
+function setDefaultDate() {
+  const today = new Date().toISOString().split('T')[0];
+  const d = document.getElementById('tradeDate');
+  if (d) d.value = today;
+}
+
+function populateExpiryDates() {
+  const sel = document.getElementById('expirySelect');
+  const today = new Date();
+  EXPIRY_DATES.forEach(d => {
+    const dt = new Date(d + 'T00:00:00Z');
+    const diff = Math.ceil((dt - today) / 86400000);
+    if (diff > 0 && diff < 200) {
+      const opt = document.createElement('option');
+      opt.value = d;
+      const isThursday = dt.getUTCDay() === 4 || dt.getUTCDay() === 5; // Fri for some
+      const dayName = dt.toLocaleDateString('en-GB', {weekday:'short', timeZone:'UTC'});
+      opt.textContent = `${dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric',timeZone:'UTC'})} (${diff}d)`;
+      if (diff >= 6 && diff <= 14) opt.textContent += ' ✅';
+      if (diff < 6) opt.textContent += ' ⚠️ Too close';
+      sel.appendChild(opt);
+    }
+  });
+}
+
+// ═══════════════════════════════════════
+// CLOCK ENGINE
+// ═══════════════════════════════════════
+function startClock() {
+  updateClock();
+  setInterval(updateClock, 1000);
+}
+
+function getMarketTimes() {
+  const now = new Date();
+  const dubaiMs = now.getTime() + (4 * 60 - now.getTimezoneOffset()) * 60000;
+  const istMs   = now.getTime() + (5.5 * 60 - now.getTimezoneOffset()) * 60000;
+  const dubaiDate = new Date(dubaiMs);
+  const istDate   = new Date(istMs);
+  const dubaiH = dubaiDate.getUTCHours();
+  const dubaiM = dubaiDate.getUTCMinutes();
+  const istH   = istDate.getUTCHours();
+  const istM   = istDate.getUTCMinutes();
+  const dubaiMins = dubaiH * 60 + dubaiM;
+  const istMins   = istH * 60 + istM;
+  const dayOfWeek = now.getDay(); // 0=Sun, 4=Thu
+  const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
+  const isThursday = dayOfWeek === 4;
+
+  // Market phases (in IST minutes)
+  let phase = 'closed';
+  if (!isWeekday) phase = 'weekend';
+  else if (istMins < 9*60+15)  phase = 'pre';
+  else if (istMins < 10*60+30) phase = 'wait';
+  else if (istMins < 14*60+30) phase = 'entry';
+  else if (istMins < 15*60+30) phase = 'late';
+  else phase = 'closed';
+
+  return { dubaiH, dubaiM, istH, istM, dubaiMins, istMins, phase, isWeekday, isThursday };
+}
+
+function updateClock() {
+  const { dubaiH, dubaiM, istH, istM, phase } = getMarketTimes();
+
+  document.getElementById('dubaiTime').textContent = fmt12(dubaiH, dubaiM);
+  document.getElementById('istTime').textContent   = fmt12(istH, istM);
+
+  const h12 = dubaiH % 12 || 12;
+  const ap  = dubaiH >= 12 ? 'PM' : 'AM';
+  document.getElementById('headerTime').innerHTML = `<b>${h12}:${pad(dubaiM)} ${ap}</b> DXB`;
+
+  const PHASES = {
+    weekend: { dubai:'🔴 Weekend', ist:'🔴 Closed', cls:'market-closed' },
+    pre:     { dubai:'⏳ Pre-market', ist:'⏳ Pre-market', cls:'market-wait' },
+    wait:    { dubai:'⚡ Wait (settle)', ist:'🟡 Settling', cls:'market-wait' },
+    entry:   { dubai:'✅ ENTRY WINDOW', ist:'🟢 LIVE', cls:'market-entry' },
+    late:    { dubai:'⚠️ Late session', ist:'🟡 Late', cls:'market-wait' },
+    closed:  { dubai:'🔴 Closed', ist:'🔴 Closed', cls:'market-closed' }
+  };
+  const p = PHASES[phase] || PHASES.closed;
+  document.getElementById('dubaiStatus').innerHTML = `<span class="${p.cls}">${p.dubai}</span>`;
+  document.getElementById('istStatus').innerHTML   = `<span class="${p.cls}">${p.ist}</span>`;
+
+  updatePhaseBanner(phase, dubaiH, dubaiM, istH, istM);
+}
+
+function updatePhaseBanner(phase, dH, dM, iH, iM) {
+  const el = document.getElementById('phaseBanner');
+  const msgs = {
+    weekend: { cls:'phase-closed', icon:'🔴', msg:'Market is closed — Weekend. Next open: Monday 7:45 AM Dubai' },
+    pre:     { cls:'phase-pre',    icon:'⏳', msg:`Market opens at 7:45 AM Dubai (9:15 AM IST) — ${timeUntil(iH, iM, 9, 15)} to go` },
+    wait:    { cls:'phase-wait',   icon:'⚡', msg:`Wait for settlement — Entry window opens at 9:00 AM Dubai (10:30 AM IST) — ${timeUntil(iH, iM, 10, 30)} to go` },
+    entry:   { cls:'phase-entry',  icon:'✅', msg:`Entry window OPEN ✅ — Best time to trade. Closes at 11:00 AM Dubai (12:30 PM IST)` },
+    late:    { cls:'phase-wait',   icon:'⚠️', msg:'Late session — Reduced theta. Consider smaller size or skip income trade.' },
+    closed:  { cls:'phase-closed', icon:'🔴', msg:'Market closed — NSE closes at 2:00 PM Dubai (3:30 PM IST)' }
+  };
+  const info = msgs[phase] || msgs.closed;
+  el.innerHTML = `<div class="phase-banner ${info.cls}"><span class="${phase==='entry'?'pulse':''}">${info.icon}</span><span>${info.msg}</span></div>`;
+}
+
+function timeUntil(curH, curM, targetH, targetM) {
+  const diff = (targetH * 60 + targetM) - (curH * 60 + curM);
+  if (diff <= 0) return '0m';
+  const h = Math.floor(diff / 60);
+  const m = diff % 60;
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+function fmt12(h, m) {
+  const ap = h >= 12 ? 'PM' : 'AM';
+  return `${(h % 12 || 12)}:${pad(m)} ${ap}`;
+}
+function pad(n) { return String(n).padStart(2,'0'); }
+
+// ═══════════════════════════════════════
+// VIX METER + LIVE INPUTS
+// ═══════════════════════════════════════
+function onVixChange() {
+  const vix = parseFloat(document.getElementById('vixInput').value);
+  if (!isNaN(vix)) updateVixMeter(vix);
+}
+
+function onNiftyChange() {
+  const nifty = parseFloat(document.getElementById('niftyInput').value);
+  const prev  = parseFloat(document.getElementById('prevClose').value);
+  if (nifty && prev) {
+    const gap = ((nifty - prev) / prev * 100).toFixed(2);
+    const color = gap >= 0 ? 'var(--green)' : 'var(--red)';
+    const sign  = gap >= 0 ? '+' : '';
+    const absGap = Math.abs(parseFloat(gap));
+    let warning = '';
+    if (absGap > 1.0) warning = ' ⚠️ HIGH RISK — consider skip';
+    else if (absGap > 0.5) warning = ' ⚡ CAUTION — wait for settlement';
+    document.getElementById('gapIndicator').style.display = 'block';
+    document.getElementById('gapIndicator').innerHTML =
+      `<div style="font-family:var(--mono);font-size:12px;color:${color};">Gap: ${sign}${gap}%${warning}</div>`;
+  }
+}
+
+function updateVixMeter(vix) {
+  const min = 8, max = 29;
+  const pct = Math.min(Math.max((vix - min) / (max - min) * 100, 0), 100);
+  document.getElementById('vixCursor').style.left = pct + '%';
+
+  let tag = '', cls = '';
+  if      (vix < 14) { tag = '🟢 STRANGLE ★ BEST PP BUY';      cls = 'tag-green'; }
+  else if (vix < 16) { tag = '🟢 STRANGLE / PP GOOD BUY';       cls = 'tag-green'; }
+  else if (vix < 18) { tag = '🔵 IRON CONDOR ✅';                cls = 'tag-accent'; }
+  else if (vix < 20) { tag = '🟡 BULL PUT SPREAD — CAUTION';    cls = 'tag-gold'; }
+  else               { tag = '🔴 SKIP INCOME / PP URGENT';       cls = 'tag-red'; }
+
+  const tagEl = document.getElementById('vixTag');
+  tagEl.textContent = tag;
+  tagEl.className = 'tag ' + cls;
+}
+
+// ═══════════════════════════════════════
+// LIVE DATA FETCH
+// ═══════════════════════════════════════
+async function fetchLiveData() {
+  if (!navigator.onLine) { showFetchStatus('error','📡 Offline — enter data manually'); return; }
+  const btn = document.getElementById('fetchBtn');
+  const icon = document.getElementById('fetchIcon');
+  const label = document.getElementById('fetchLabel');
+  icon.textContent = '⏳'; label.textContent = 'Fetching...'; btn.disabled = true;
+  showFetchStatus('loading','⏳ Connecting to market data...');
+
+  let nifty = null, vix = null, prev = null;
+
+  // Try Claude web search first (if API key set)
+  if (state.settings.apiKey) {
+    try {
+      showFetchStatus('loading','🤖 Claude fetching live NSE data...');
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'x-api-key': state.settings.apiKey,
+          'anthropic-version':'2023-06-01',
+          'anthropic-dangerous-direct-browser-access':'true'
+        },
+        body: JSON.stringify({
+          model: state.settings.aiModel || 'claude-sonnet-4-20250514',
+          max_tokens: 300,
+          tools:[{type:'web_search_20250305',name:'web_search'}],
+          system:'Return ONLY valid JSON with live NSE data: {"nifty":24350.50,"vix":16.18,"prevClose":24230.70}. No other text.',
+          messages:[{role:'user',content:'What is the current Nifty 50 index value and India VIX right now? Return JSON only.'}]
+        }),
+        signal: AbortSignal.timeout(15000)
+      });
+      const d = await r.json();
+      if (!d.error) {
+        const txt = (d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+        const m = txt.match(/\{[\s\S]*?\}/);
+        if (m) {
+          const p = JSON.parse(m[0]);
+          if (p.nifty) nifty = parseFloat(p.nifty);
+          if (p.vix)   vix   = parseFloat(p.vix);
+          if (p.prevClose) prev = parseFloat(p.prevClose);
+        }
+      }
+    } catch(e) { console.log('Claude fetch failed:', e); }
+  }
+
+  // Yahoo Finance via allorigins proxy
+  if (!nifty || !vix) {
+    const proxy = 'https://api.allorigins.win/get?url=';
+    try {
+      showFetchStatus('loading','⏳ Fetching Nifty from Yahoo Finance...');
+      const nr = await fetch(proxy + encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/%5ENSEI?interval=1d&range=2d'), {signal:AbortSignal.timeout(8000)});
+      const nd = JSON.parse((await nr.json()).contents);
+      const np = nd?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      const pc = nd?.chart?.result?.[0]?.meta?.previousClose;
+      if (np) { nifty = np; if (pc && !prev) prev = pc; }
+    } catch(e) { console.log('Nifty Yahoo failed:', e); }
+
+    try {
+      showFetchStatus('loading','⏳ Fetching India VIX...');
+      const vr = await fetch(proxy + encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/%5EINDIAVIX?interval=1d&range=2d'), {signal:AbortSignal.timeout(8000)});
+      const vd = JSON.parse((await vr.json()).contents);
+      const vp = vd?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      if (vp) vix = vp;
+    } catch(e) { console.log('VIX Yahoo failed:', e); }
+  }
+
+  // NSE India API fallback
+  if (!nifty || !vix) {
+    try {
+      showFetchStatus('loading','⏳ Trying NSE India API...');
+      const r = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://www.nseindia.com/api/allIndices'), {signal:AbortSignal.timeout(8000)});
+      const d = JSON.parse((await r.json()).contents);
+      const indices = d?.data || [];
+      const n50 = indices.find(i => i.indexSymbol === 'NIFTY 50');
+      const ivx = indices.find(i => i.indexSymbol === 'INDIA VIX');
+      if (n50 && !nifty) { nifty = parseFloat(n50.last); if (!prev) prev = parseFloat(n50.previousClose); }
+      if (ivx && !vix)   vix = parseFloat(ivx.last);
+    } catch(e) { console.log('NSE fallback failed:', e); }
+  }
+
+  // Set values
+  const timeStr = new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  if (nifty) { document.getElementById('niftyInput').value = nifty.toFixed(2); onNiftyChange(); }
+  if (vix)   { document.getElementById('vixInput').value   = vix.toFixed(2);   updateVixMeter(vix); }
+  if (prev)    document.getElementById('prevClose').value  = prev.toFixed(2);
+  if (!document.getElementById('lotSize').value) document.getElementById('lotSize').value = state.settings.lotSize;
+
+  if (nifty && vix) {
+    showFetchStatus('success', `✅ Live: Nifty ${nifty.toFixed(2)} | VIX ${vix.toFixed(2)}`);
+    const lu = document.getElementById('lastUpdated');
+    lu.style.display = 'block'; lu.textContent = `⏰ Last updated: ${timeStr} Dubai`;
+    scheduleAutoRefresh();
+  } else if (nifty || vix) {
+    showFetchStatus('warn', `⚠️ Partial: ${nifty?'Nifty ✅':'Nifty ❌'} | ${vix?'VIX ✅':'VIX ❌'} — enter missing manually`);
+  } else {
+    showFetchStatus('error', '❌ All sources failed — market may be closed or network blocked. Enter manually.');
+  }
+
+  icon.textContent = '🔄'; label.textContent = (nifty && vix) ? 'Refresh' : 'Retry'; btn.disabled = false;
+}
+
+function showFetchStatus(type, msg) {
+  const el = document.getElementById('fetchStatus');
+  el.style.display = 'block';
+  const map = {
+    loading:'background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);color:var(--gold);',
+    success:'background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);color:var(--green);',
+    warn:   'background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);color:var(--gold);',
+    error:  'background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);color:var(--red);'
+  };
+  el.style.cssText = `display:block;margin-bottom:10px;padding:8px 12px;border-radius:var(--radius-sm);font-size:11px;font-family:var(--mono);${map[type]||map.loading}`;
+  el.textContent = msg;
+}
+
+let autoTimer = null;
+function scheduleAutoRefresh() {
+  if (autoTimer) clearInterval(autoTimer);
+  let countdown = 300;
+  autoTimer = setInterval(() => {
+    countdown--;
+    const label = document.getElementById('fetchLabel');
+    if (!label) { clearInterval(autoTimer); return; }
+    if (countdown <= 0) {
+      clearInterval(autoTimer);
+      label.textContent = 'Refresh';
+      const {phase} = getMarketTimes();
+      if (phase === 'entry' || phase === 'wait') fetchLiveData();
+    } else {
+      label.textContent = countdown <= 60 ? `Auto ${countdown}s` : `Auto ${Math.ceil(countdown/60)}m`;
+    }
+  }, 1000);
+}
+
+// ═══════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('page-' + tab).classList.add('active');
+  state.currentTab = tab;
+  if (tab === 'refs') buildRoutine();
+}
+
+// ═══════════════════════════════════════
+// STRATEGY ANALYSIS ENGINE
+// ═══════════════════════════════════════
+function analyzeSetup() {
+  const nifty   = parseFloat(document.getElementById('niftyInput').value);
+  const vix     = parseFloat(document.getElementById('vixInput').value);
+  const prevCl  = parseFloat(document.getElementById('prevClose').value);
+  const lotSize = parseInt(document.getElementById('lotSize').value) || state.settings.lotSize || 65;
+  const expiry  = document.getElementById('expirySelect').value;
+  const vixDir  = document.getElementById('vixDirection').value;
+
+  if (!nifty || !vix) { alert('Please enter Nifty and VIX values first.'); return; }
+
+  // Compute gap
+  const gapPct = prevCl ? ((nifty - prevCl) / prevCl * 100) : 0;
+
+  // Run gates
+  const { phase, isThursday } = getMarketTimes();
+  const gates = runGateChecks(phase, isThursday, gapPct, expiry, vixDir);
+
+  // Select strategy
+  const strategy = selectStrategy(vix);
+
+  // Calculate strikes
+  const calc = calculateStrikes(strategy, nifty, vix, lotSize, expiry);
+
+  // Store analysis
+  state.lastAnalysis = { nifty, vix, prevCl, gapPct, lotSize, expiry, vixDir, strategy, calc, gates };
+
+  // Render everything
+  renderGates(gates);
+  renderStrategyResult(strategy, vix, gates);
+  if (calc) renderTradeCard(calc, strategy, nifty, vix, expiry, lotSize);
+  renderPpSignal(vix);
+  renderRoutineCard();
+
+  // Show action buttons
+  document.getElementById('actionBtns').style.display = 'flex';
+  document.getElementById('analyzeBtn').textContent = '🔄 RE-ANALYZE';
+
+  // Scroll to results
+  setTimeout(() => document.getElementById('gatesCard').scrollIntoView({behavior:'smooth', block:'start'}), 100);
+}
+
+// ─── GATE CHECKS ───
+function runGateChecks(phase, isThursday, gapPct, expiry, vixDir) {
+  const gates = [];
+
+  // Gate 1: Time
+  const timeChecks = {
+    entry:   { pass:true,  icon:'✅', label:'TIME — Entry Window Open', val:'Now is 9:00–11:00 AM Dubai (10:30–12:30 IST) ✅' },
+    wait:    { pass:false, warn:true, icon:'⚡', label:'TIME — Too Early', val:'Wait until 9:00 AM Dubai (10:30 AM IST)' },
+    late:    { pass:false, warn:true, icon:'⚠️', label:'TIME — Late Session', val:'After 11:00 AM Dubai — reduced theta, smaller size' },
+    closed:  { pass:false, icon:'❌', label:'TIME — Market Closed', val:'NSE is closed. Check back on a weekday.' },
+    weekend: { pass:false, icon:'❌', label:'TIME — Weekend', val:'Market closed. NSE opens Monday 9:15 AM IST.' },
+    pre:     { pass:false, warn:true, icon:'⏳', label:'TIME — Pre-Market', val:'Market opens at 7:45 AM Dubai (9:15 AM IST)' }
+  };
+  gates.push(timeChecks[phase] || timeChecks.closed);
+
+  // Gate 2: Gap
+  const absGap = Math.abs(gapPct);
+  if (!gapPct) {
+    gates.push({ pass:true, warn:true, icon:'ℹ️', label:'GAP — No prev close entered', val:'Enter previous close to check gap risk' });
+  } else if (absGap > 1.0) {
+    gates.push({ pass:false, icon:'❌', label:'GAP — HIGH RISK', val:`Gap ${gapPct > 0 ? '+' : ''}${gapPct.toFixed(2)}% > 1% — consider skipping today` });
+  } else if (absGap > 0.5) {
+    gates.push({ pass:false, warn:true, icon:'⚡', label:'GAP — CAUTION', val:`Gap ${gapPct > 0 ? '+' : ''}${gapPct.toFixed(2)}% > 0.5% — wait for settlement` });
+  } else {
+    gates.push({ pass:true, icon:'✅', label:'GAP — Clear', val:`Gap ${gapPct > 0 ? '+' : ''}${gapPct.toFixed(2)}% < 0.5% ✅` });
+  }
+
+  // Gate 3: Expiry
+  if (!expiry) {
+    gates.push({ pass:false, warn:true, icon:'⚠️', label:'EXPIRY — Not selected', val:'Select an expiry date above' });
+  } else {
+    const days = Math.ceil((new Date(expiry) - new Date()) / 86400000);
+    if (isThursday) {
+      gates.push({ pass:false, icon:'❌', label:'EXPIRY — Today is Thursday!', val:'Never enter on expiry day — SKIP' });
+    } else if (days < 6) {
+      gates.push({ pass:false, icon:'❌', label:'EXPIRY — Too close!', val:`Only ${days} days to expiry — select next week` });
+    } else if (days >= 6 && days <= 14) {
+      gates.push({ pass:true, icon:'✅', label:'EXPIRY — Optimal', val:`${days} days to expiry ✅ (ideal: 8-14 days)` });
+    } else {
+      gates.push({ pass:true, warn:true, icon:'ℹ️', label:'EXPIRY — Acceptable', val:`${days} days to expiry (prefer 8-14 days for max theta)` });
+    }
+  }
+
+  // Gate 4: VIX direction
+  const vixDirChecks = {
+    falling:       { pass:true,  icon:'✅', label:'VIX DIRECTION — Falling', val:'VIX falling ↓ — premiums compressing, good for income ✅' },
+    stable:        { pass:true,  icon:'✅', label:'VIX DIRECTION — Stable', val:'VIX stable — proceed normally ✅' },
+    rising:        { pass:false, warn:true, icon:'⚡', label:'VIX DIRECTION — Rising', val:'VIX rising ↑ — be cautious, consider waiting' },
+    rising_sharp:  { pass:false, icon:'❌', label:'VIX DIRECTION — Rising Sharply!', val:'VIX spiking ↑↑ — WAIT. Enter after VIX stabilizes.' }
+  };
+  gates.push(vixDirChecks[vixDir] || vixDirChecks.stable);
+
+  return gates;
+}
+
+// ─── STRATEGY SELECTION ───
+function selectStrategy(vix) {
+  if (vix < 14)  return 'long_strangle';
+  if (vix < 16)  return 'long_strangle';
+  if (vix < 18)  return 'iron_condor';
+  if (vix < 20)  return 'bull_put_spread';
+  return 'skip';
+}
+
+// ─── STRIKE CALCULATOR ───
+function roundTo50(n) { return Math.round(n / 50) * 50; }
+
+function calculateStrikes(strategy, nifty, vix, lotSize, expiry) {
+  const wing = state.settings.wingWidth || 500;
+  const expiryLabel = expiry ? new Date(expiry).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric',timeZone:'UTC'}) : '--';
+  const days = expiry ? Math.ceil((new Date(expiry) - new Date()) / 86400000) : 0;
+
+  if (strategy === 'iron_condor') {
+    const otmPct = vix < 17 ? 0.018 : 0.020;
+    const sellPE = roundTo50(nifty * (1 - otmPct));
+    const buyPE  = sellPE - wing;
+    const sellCE = roundTo50(nifty * (1 + otmPct));
+    const buyCE  = sellCE + wing;
+
+    // Estimated prices (rough)
+    const sellPEprice = Math.round(nifty * 0.0045);
+    const buyPEprice  = Math.round(sellPEprice * 0.25);
+    const sellCEprice = Math.round(nifty * 0.0045);
+    const buyCEprice  = Math.round(sellCEprice * 0.25);
+
+    const netCredit = (sellPEprice - buyPEprice) + (sellCEprice - buyCEprice);
+    const creditLot = netCredit * lotSize;
+    const maxProfit = creditLot;
+    const stopLoss  = creditLot * 2;
+    const target50  = creditLot * 0.5;
+
+    const lowerBE = sellPE - netCredit;
+    const upperBE = sellCE + netCredit;
+    const lowerPct = ((nifty - lowerBE) / nifty * 100).toFixed(2);
+    const upperPct = ((upperBE - nifty) / nifty * 100).toFixed(2);
+
+    return {
+      type:'iron_condor', strategy:'Iron Condor', expiryLabel, days,
+      legs:[
+        {action:'BUY',  strike:buyCE,  optType:'CE', price:buyCEprice,  desc:`Wing — caps upside loss`},
+        {action:'SELL', strike:sellCE, optType:'CE', price:sellCEprice, desc:`Upper short leg — OTM ${((sellCE-nifty)/nifty*100).toFixed(1)}%`},
+        {action:'SELL', strike:sellPE, optType:'PE', price:sellPEprice, desc:`Lower short leg — OTM ${((nifty-sellPE)/nifty*100).toFixed(1)}%`},
+        {action:'BUY',  strike:buyPE,  optType:'PE', price:buyPEprice,  desc:`Wing — caps downside loss`}
+      ],
+      netCredit, creditLot, maxProfit, stopLoss, target50,
+      lowerBE, upperBE, lowerPct, upperPct,
+      niftyRange:`${sellPE}–${sellCE}`,
+      sensibullNote:'Bottom must show "GET" ✅ not "PAY"'
+    };
+  }
+
+  if (strategy === 'long_strangle') {
+    const buyCE = roundTo50(nifty * 1.015);
+    const buyPE = roundTo50(nifty * 0.985);
+
+    const cePriceEst = Math.round(nifty * 0.0052);
+    const pePriceEst = Math.round(nifty * 0.0052);
+    const totalDebit = cePriceEst + pePriceEst;
+    const totalLot   = totalDebit * lotSize;
+
+    const upperBE = buyCE + totalDebit;
+    const lowerBE = buyPE - totalDebit;
+    const upperPct = ((upperBE - nifty) / nifty * 100).toFixed(2);
+    const lowerPct = ((nifty - lowerBE) / nifty * 100).toFixed(2);
+
+    const warning = (cePriceEst > 150 || pePriceEst > 150)
+      ? '⚠️ Est. premium > ₹150 — go further OTM!'
+      : '✅ Both legs within ₹150 limit';
+
+    return {
+      type:'long_strangle', strategy:'Long Strangle', expiryLabel, days,
+      legs:[
+        {action:'BUY', strike:buyPE, optType:'PE', price:pePriceEst, desc:`OTM Put — ${((nifty-buyPE)/nifty*100).toFixed(1)}% below Nifty`},
+        {action:'BUY', strike:buyCE, optType:'CE', price:cePriceEst, desc:`OTM Call — ${((buyCE-nifty)/nifty*100).toFixed(1)}% above Nifty`}
+      ],
+      totalDebit, totalLot, maxProfit: null, stopLoss: totalLot,
+      lowerBE, upperBE, lowerPct, upperPct, warning,
+      niftyRange: null,
+      sensibullNote:'Total debit — Sensibull shows "PAY" is correct for long strangle'
+    };
+  }
+
+  if (strategy === 'bull_put_spread') {
+    const sellPE = roundTo50(nifty * (1 - 0.025));
+    const buyPE  = sellPE - 300;
+
+    const sellPrice = Math.round(nifty * 0.006);
+    const buyPrice  = Math.round(sellPrice * 0.35);
+    const netCredit = sellPrice - buyPrice;
+    const creditLot = netCredit * lotSize;
+    const maxLoss   = (300 - netCredit) * lotSize;
+    const target50  = creditLot * 0.5;
+
+    const lowerBE = sellPE - netCredit;
+    const lowerPct = ((nifty - lowerBE) / nifty * 100).toFixed(2);
+
+    const warning = netCredit < 40 ? '⚠️ Net credit < ₹40 — skip this setup' : '✅ Net credit acceptable';
+
+    return {
+      type:'bull_put_spread', strategy:'Bull Put Spread', expiryLabel, days,
+      legs:[
+        {action:'SELL', strike:sellPE, optType:'PE', price:sellPrice, desc:`Short put — OTM ${((nifty-sellPE)/nifty*100).toFixed(1)}%`},
+        {action:'BUY',  strike:buyPE,  optType:'PE', price:buyPrice,  desc:'Long put — hedge/protection'}
+      ],
+      netCredit, creditLot, maxProfit: creditLot, stopLoss: maxLoss, target50,
+      lowerBE, lowerPct, warning,
+      sensibullNote:'Shows "GET" — net credit received'
+    };
+  }
+
+  return null; // skip
+}
+
+// ─── RENDER GATES ───
+function renderGates(gates) {
+  const card = document.getElementById('gatesCard');
+  const container = document.getElementById('gatesContainer');
+  card.style.display = 'block';
+  container.innerHTML = '';
+  gates.forEach((g, i) => {
+    const cls = g.pass ? 'pass' : (g.warn ? 'warn' : 'fail');
+    const div = document.createElement('div');
+    div.className = `gate ${cls}`;
+    div.style.animationDelay = `${i * 0.08}s`;
+    div.innerHTML = `
+      <div class="gate-icon">${g.icon}</div>
+      <div class="gate-text">
+        <div class="gate-label">${g.label}</div>
+        <div class="gate-val">${g.val}</div>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+// ─── RENDER STRATEGY RESULT ───
+function renderStrategyResult(strategy, vix, gates) {
+  const el = document.getElementById('strategyResult');
+  el.style.display = 'block';
+
+  const allPass   = gates.every(g => g.pass);
+  const hasHard   = gates.some(g => !g.pass && !g.warn);
+  const hasWarn   = gates.some(g => !g.pass && g.warn);
+
+  const names = {
+    iron_condor:    { name:'🏗️ Iron Condor', sub:`VIX ${vix.toFixed(2)} — Sell premium. Collect theta.`, cls:'go' },
+    long_strangle:  { name:'↔️ Long Strangle', sub:`VIX ${vix.toFixed(2)} — Buy cheap premium. Expect big move.`, cls:'go' },
+    bull_put_spread:{ name:'🐂 Bull Put Spread', sub:`VIX ${vix.toFixed(2)} — Caution mode. Defined risk only.`, cls:'caution' },
+    skip:           { name:'⛔ SKIP Income Trade', sub:`VIX ${vix.toFixed(2)} > 20 — Too expensive to buy. See PP section below.`, cls:'skip' }
+  };
+
+  const info = names[strategy] || names.skip;
+  let cls = info.cls;
+  let verdict = '';
+
+  if (strategy === 'skip') {
+    verdict = '🔴 NO-GO — VIX too high for income trade';
+    cls = 'skip';
+  } else if (hasHard) {
+    verdict = '🔴 NO-GO — One or more hard gates failed';
+    cls = 'skip';
+  } else if (hasWarn) {
+    verdict = '🟡 PROCEED WITH CAUTION — Check warnings above';
+    cls = 'caution';
+  } else {
+    verdict = '🟢 GO — All gates passed. Ready to trade!';
+    cls = 'go';
+  }
+
+  el.innerHTML = `
+    <div class="strategy-result ${cls}">
+      <div class="strategy-name">${info.name}</div>
+      <div class="strategy-sub">${info.sub}</div>
+      <div style="margin-top:10px;font-size:14px;font-weight:800;">${verdict}</div>
+    </div>`;
+}
+
+// ─── RENDER TRADE CARD ───
+function renderTradeCard(calc, strategy, nifty, vix, expiry, lotSize) {
+  const container = document.getElementById('tradeCardContainer');
+  container.style.display = 'block';
+
+  const today = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const { dubaiH, dubaiM, istH, istM } = (() => {
+    const now = new Date();
+    const dubaiMs = now.getTime() + (4*60 - now.getTimezoneOffset())*60000;
+    const istMs   = now.getTime() + (5.5*60 - now.getTimezoneOffset())*60000;
+    const d = new Date(dubaiMs), i = new Date(istMs);
+    return { dubaiH:d.getUTCHours(), dubaiM:d.getUTCMinutes(), istH:i.getUTCHours(), istM:i.getUTCMinutes() };
+  })();
+
+  const headerCls = { iron_condor:'tc-ic', long_strangle:'tc-ls', bull_put_spread:'tc-bps', protective_put:'tc-pp' };
+  const hCls = headerCls[calc.type] || 'tc-ic';
+
+  let legsHtml = calc.legs.map(leg => `
+    <div class="leg-row">
+      <div class="leg-badge ${leg.action === 'BUY' ? 'buy' : 'sell'}">${leg.action}</div>
+      <div class="leg-info">
+        <div class="leg-strike">${leg.strike.toLocaleString('en-IN')} ${leg.optType}</div>
+        <div class="leg-desc">${leg.desc}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="leg-price">₹${leg.price}</div>
+        <div class="leg-price-label">est. price</div>
+      </div>
+    </div>`).join('');
+
+  // Financial summary
+  const isCredit = calc.netCredit !== undefined && calc.type !== 'long_strangle';
+  let finHtml = '';
+
+  if (calc.type === 'iron_condor' || calc.type === 'bull_put_spread') {
+    finHtml = `
+      <div class="financials">
+        <div class="fin-row"><span class="fin-label">Net Credit/share</span><span class="fin-value green">₹${calc.netCredit}</span></div>
+        <div class="fin-row"><span class="fin-label">Per lot (${lotSize} shares)</span><span class="fin-value green">₹${calc.creditLot.toLocaleString('en-IN')}</span></div>
+        <div class="fin-divider"></div>
+        <div class="fin-row"><span class="fin-label">Max Profit</span><span class="fin-value green">₹${calc.maxProfit.toLocaleString('en-IN')}</span></div>
+        <div class="fin-row"><span class="fin-label">50% Target ✅ EXIT HERE</span><span class="fin-value accent">₹${calc.target50.toLocaleString('en-IN')}</span></div>
+        <div class="fin-row"><span class="fin-label">Stop Loss (2× credit)</span><span class="fin-value red">₹${calc.stopLoss.toLocaleString('en-IN')}</span></div>
+        <div class="fin-divider"></div>
+        ${calc.lowerBE ? `<div class="fin-row"><span class="fin-label">Lower Breakeven</span><span class="fin-value">${calc.lowerBE.toLocaleString('en-IN')} (-${calc.lowerPct}%)</span></div>` : ''}
+        ${calc.upperBE ? `<div class="fin-row"><span class="fin-label">Upper Breakeven</span><span class="fin-value">${calc.upperBE.toLocaleString('en-IN')} (+${calc.upperPct}%)</span></div>` : ''}
+        ${calc.niftyRange ? `<div class="fin-row"><span class="fin-label">Safe Range</span><span class="fin-value accent">${calc.niftyRange}</span></div>` : ''}
+        ${calc.warning ? `<div style="margin-top:8px;font-size:11px;color:var(--gold);">${calc.warning}</div>` : ''}
+        <div class="fin-divider"></div>
+        <div style="font-size:11px;color:var(--text2);">🔴 Sensibull: ${calc.sensibullNote}</div>
+      </div>`;
+  } else if (calc.type === 'long_strangle') {
+    finHtml = `
+      <div class="financials">
+        <div class="fin-row"><span class="fin-label">Total Cost/share</span><span class="fin-value red">₹${calc.totalDebit}</span></div>
+        <div class="fin-row"><span class="fin-label">Per lot (${lotSize} shares)</span><span class="fin-value red">₹${calc.totalLot.toLocaleString('en-IN')}</span></div>
+        <div class="fin-divider"></div>
+        <div class="fin-row"><span class="fin-label">Stop Loss</span><span class="fin-value red">₹${calc.stopLoss.toLocaleString('en-IN')} (full debit)</span></div>
+        <div class="fin-row"><span class="fin-label">Lower Breakeven</span><span class="fin-value">${calc.lowerBE.toLocaleString('en-IN')} (-${calc.lowerPct}%)</span></div>
+        <div class="fin-row"><span class="fin-label">Upper Breakeven</span><span class="fin-value">${calc.upperBE.toLocaleString('en-IN')} (+${calc.upperPct}%)</span></div>
+        <div style="margin-top:8px;font-size:11px;color:${calc.warning.startsWith('⚠️') ? 'var(--gold)' : 'var(--green)'};">${calc.warning}</div>
+        <div class="fin-divider"></div>
+        <div style="font-size:11px;color:var(--text2);">ℹ️ ${calc.sensibullNote}</div>
+      </div>`;
+  }
+
+  container.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div class="section-title" style="margin-bottom:0;">TRADE CARD</div>
+      <button class="btn btn-outline btn-sm" onclick="copyTradeCard()" style="font-size:11px;padding:6px 12px;">📋 Copy</button>
+    </div>
+    <div class="trade-card">
+      <div class="trade-card-header ${hCls}">
+        <span>📊 ${calc.strategy.toUpperCase()} — ${today}</span>
+        <span>${fmt12(dubaiH,dubaiM)} Dubai</span>
+      </div>
+      <div style="padding:10px 16px 4px;display:flex;gap:16px;font-size:11px;color:var(--text2);">
+        <span>Nifty: <b style="color:var(--text);font-family:var(--mono);">${nifty.toLocaleString('en-IN')}</b></span>
+        <span>VIX: <b style="color:var(--text);font-family:var(--mono);">${vix.toFixed(2)}</b></span>
+        <span>Expiry: <b style="color:var(--accent);">${calc.expiryLabel} (${calc.days}d)</b></span>
+      </div>
+      ${legsHtml}
+      ${finHtml}
+    </div>`;
+}
+
+// ─── PP SIGNAL ───
+function renderPpSignal(vix) {
+  const el = document.getElementById('ppSignal');
+  el.style.display = 'block';
+
+  let cls = '', icon = '', title = '', sub = '';
+  if      (vix < 14) { cls='pp-best';   icon='🟢'; title='BEST TIME TO BUY PROTECTIVE PUT!';   sub='VIX < 14 = cheapest insurance available. Buy now if not already protected!'; }
+  else if (vix < 16) { cls='pp-good';   icon='🟢'; title='Good time to buy Protective Put';     sub='VIX 14-16 = good entry. Premiums reasonable. Consider buying PP.'; }
+  else if (vix < 17) { cls='pp-ok';     icon='🟡'; title='Acceptable PP entry';                 sub='VIX 16-17 = slightly elevated. Still OK to buy, but wait for a dip if possible.'; }
+  else if (vix < 18) { cls='pp-wait';   icon='🟠'; title='Wait if possible';                   sub='VIX 17-18 = premiums elevated. Wait for VIX to dip below 17. Exception: if portfolio up >15%, buy anyway.'; }
+  else if (vix < 20) { cls='pp-wait';   icon='🔴'; title='Too expensive — Wait';               sub='VIX 18-20 = do not buy PP now. Watch for next dip below 17.'; }
+  else               { cls='pp-urgent'; icon='🚨'; title='URGENT — BUY PP IMMEDIATELY!';       sub='VIX > 20 = portfolio at risk! Cost doesn\'t matter. Protection first! Buy when VIX peaks and starts to turn down.'; }
+
+  el.innerHTML = `
+    <div style="margin-bottom:8px;" class="section-title">🛡️ PROTECTIVE PUT SIGNAL</div>
+    <div class="pp-signal ${cls}">
+      <div class="pp-row">${icon} <strong>${title}</strong></div>
+      <div class="pp-sub">${sub}</div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);font-family:var(--mono);padding:0 2px;">
+      📌 PP Setup: BUY 2× Sep 23,000 PE + SELL 2× Sep 22,000 PE<br>
+      Est. cost: ~₹180-220/share → ~₹23,400 total | ₹177/day
+    </div>`;
+}
+
+// ─── DAILY ROUTINE ───
+const ROUTINE = [
+  { dubai:'7:45 AM',  ist:'9:15 AM',  action:'Market opens — observe only', highlight:false },
+  { dubai:'8:30 AM',  ist:'10:00 AM', action:'Check VIX + consult Claude AI', highlight:false },
+  { dubai:'8:55 AM',  ist:'10:25 AM', action:'Calculate strikes in Sensibull', highlight:false },
+  { dubai:'9:00 AM',  ist:'10:30 AM', action:'EXECUTE if all gates ✅', highlight:true },
+  { dubai:'11:00 AM', ist:'12:30 PM', action:'Midday check (1 glance only)', highlight:false },
+  { dubai:'2:00 PM',  ist:'3:30 PM',  action:'Market closes', highlight:false },
+  { dubai:'Friday 1:30 PM', ist:'3:00 PM', action:'Exit ALL positions!', highlight:true }
+];
+
+function buildRoutine() {
+  const { dubaiH, dubaiM } = (() => {
+    const now = new Date();
+    const d = new Date(now.getTime() + (4*60 - now.getTimezoneOffset())*60000);
+    return { dubaiH: d.getUTCHours(), dubaiM: d.getUTCMinutes() };
+  })();
+  const currentMins = dubaiH * 60 + dubaiM;
+
+  const html = ROUTINE.map(r => {
+    const timeParts = r.dubai.match(/(\d+):(\d+) (AM|PM)/);
+    let isNow = false;
+    if (timeParts) {
+      let h = parseInt(timeParts[1]);
+      const m = parseInt(timeParts[2]);
+      if (timeParts[3] === 'PM' && h !== 12) h += 12;
+      const tMins = h * 60 + m;
+      isNow = Math.abs(currentMins - tMins) < 30;
+    }
+    return `<div class="routine-row ${isNow ? 'routine-current' : ''}">
+      <span class="routine-time">${r.dubai}<br><span style="color:var(--text3)">${r.ist} IST</span></span>
+      <span class="routine-action" style="color:${r.highlight?'var(--accent)':'var(--text2)'};font-weight:${r.highlight?700:400}">${r.action}</span>
+    </div>`;
+  }).join('');
+
+  const el1 = document.getElementById('routineRef');
+  if (el1) el1.innerHTML = html;
+}
+
+function renderRoutineCard() {
+  const el = document.getElementById('routineCard');
+  el.style.display = 'block';
+  buildRoutine();
+  el.innerHTML = `
+    <div class="section-title" style="margin-bottom:8px;">⏰ DAILY ROUTINE</div>
+    <div class="routine-card" id="routineMain"></div>`;
+  const target = document.getElementById('routineMain');
+  if (target) {
+    const { dubaiH, dubaiM } = (() => {
+      const now = new Date();
+      const d = new Date(now.getTime() + (4*60 - now.getTimezoneOffset())*60000);
+      return { dubaiH: d.getUTCHours(), dubaiM: d.getUTCMinutes() };
+    })();
+    const currentMins = dubaiH * 60 + dubaiM;
+    target.innerHTML = ROUTINE.map(r => {
+      const timeParts = r.dubai.match(/(\d+):(\d+) (AM|PM)/);
+      let isNow = false;
+      if (timeParts) {
+        let h = parseInt(timeParts[1]), m = parseInt(timeParts[2]);
+        if (timeParts[3]==='PM' && h!==12) h+=12;
+        isNow = Math.abs(currentMins - h*60 - m) < 30;
+      }
+      return `<div class="routine-row ${isNow?'routine-current':''}">
+        <span class="routine-time">${r.dubai}<br><span style="color:var(--text3)">${r.ist} IST</span></span>
+        <span class="routine-action" style="color:${r.highlight?'var(--accent)':'var(--text2)'};font-weight:${r.highlight?700:400}">${r.action}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ─── COPY TRADE CARD ───
+function copyTradeCard() {
+  const calc = state.lastAnalysis?.calc;
+  if (!calc) return;
+  const { nifty, vix, expiry, lotSize } = state.lastAnalysis;
+  let text = `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📊 TRADE SETUP — ${new Date().toLocaleDateString('en-GB')}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+  text += `Strategy: ${calc.strategy}\nExpiry:   ${calc.expiryLabel} (${calc.days}d)\nNifty:    ${nifty}\nVIX:      ${vix}\n\nLEGS:\n`;
+  calc.legs.forEach(l => { text += `${l.action}  ${l.strike} ${l.optType}  @ ₹${l.price}\n`; });
+  if (calc.netCredit) text += `\nNet Credit: ₹${calc.netCredit}/share = ₹${calc.creditLot} per lot\n`;
+  if (calc.target50)  text += `50% Target: ₹${calc.target50}\nStop Loss: ₹${calc.stopLoss}\n`;
+  if (calc.lowerBE)   text += `Lower BE: ${calc.lowerBE}\n`;
+  if (calc.upperBE)   text += `Upper BE: ${calc.upperBE}\n`;
+  text += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+  navigator.clipboard.writeText(text).then(() => showToast('Trade card copied!')).catch(() => alert(text));
+}
+
+// ═══════════════════════════════════════
+// POSITION TRACKER
+// ═══════════════════════════════════════
+function activatePosition() {
+  const a = state.lastAnalysis;
+  if (!a || !a.calc) { alert('Analyze a setup first.'); return; }
+  state.openPosition = {
+    strategy: a.calc.strategy, expiry: a.expiry, expiryLabel: a.calc.expiryLabel,
+    entryNifty: a.nifty, entryVix: a.vix, lotSize: a.lotSize,
+    legs: a.calc.legs, maxProfit: a.calc.maxProfit || a.calc.totalLot,
+    target50: a.calc.target50, stopLoss: a.calc.stopLoss,
+    netCredit: a.calc.netCredit || 0, creditLot: a.calc.creditLot || 0
+  };
+  saveToStorage();
+  renderPositionTracker();
+  switchTab('position');
+}
+
+function renderPositionTracker() {
+  const pos = state.openPosition;
+  if (!pos) { document.getElementById('noPosition').style.display='block'; document.getElementById('positionTracker').style.display='none'; return; }
+  document.getElementById('noPosition').style.display='none';
+  document.getElementById('positionTracker').style.display='block';
+  document.getElementById('posStrategy').textContent = pos.strategy;
+  document.getElementById('posExpiry').textContent = `Expiry: ${pos.expiryLabel}`;
+  document.getElementById('posEntryNifty').textContent = pos.entryNifty?.toLocaleString('en-IN') || '--';
+  document.getElementById('posEntryVix').textContent = `VIX ${pos.entryVix?.toFixed(2) || '--'}`;
+  document.getElementById('statMaxProfit').textContent = `₹${(pos.maxProfit||0).toLocaleString('en-IN')}`;
+  document.getElementById('statTarget').textContent    = `₹${(pos.target50||0).toLocaleString('en-IN')}`;
+  document.getElementById('statStop').textContent      = `-₹${(pos.stopLoss||0).toLocaleString('en-IN')}`;
+
+  // Legs
+  const legsEl = document.getElementById('posLegs');
+  legsEl.innerHTML = (pos.legs||[]).map(l => `
+    <div class="leg-row">
+      <div class="leg-badge ${l.action==='BUY'?'buy':'sell'}">${l.action}</div>
+      <div class="leg-info">
+        <div class="leg-strike">${l.strike.toLocaleString('en-IN')} ${l.optType}</div>
+        <div class="leg-desc">${l.desc}</div>
+      </div>
+      <div class="leg-price">₹${l.price}</div>
+    </div>`).join('');
+}
+
+function updatePnlTracker() {
+  const pos = state.openPosition;
+  if (!pos) return;
+  const pnl = parseFloat(document.getElementById('currentPnl').value) || 0;
+  const maxP = pos.maxProfit || 1;
+  const pct   = Math.max(0, Math.min(100, (pnl / maxP) * 100));
+  document.getElementById('statProgress').textContent = `${pct.toFixed(0)}%`;
+  document.getElementById('progressBar').style.width  = pct + '%';
+
+  const alertEl = document.getElementById('pnlAlert');
+  if (pnl >= (pos.target50 || 0)) {
+    alertEl.innerHTML = `<div class="success-banner">🎯 TARGET HIT! Exit now — take ₹${pnl.toLocaleString('en-IN')} profit!</div>`;
+  } else if (pnl <= -(pos.stopLoss || 0)) {
+    alertEl.innerHTML = `<div class="warning-banner">🛑 STOP LOSS HIT! Exit immediately — cut losses!</div>`;
+  } else {
+    alertEl.innerHTML = '';
+  }
+}
+
+function updateDistances() {
+  const pos = state.openPosition;
+  if (!pos) return;
+  const cur = parseFloat(document.getElementById('currentNifty').value);
+  if (!cur) { document.getElementById('distanceContainer').innerHTML = '<div style="font-size:12px;color:var(--text3);">Enter current Nifty above</div>'; return; }
+
+  const sells = (pos.legs||[]).filter(l => l.action === 'SELL');
+  let html = '';
+  sells.forEach(leg => {
+    const dist = Math.abs(cur - leg.strike);
+    const pct  = (dist / cur * 100).toFixed(2);
+    const isClose = dist < cur * 0.01;
+    const color = isClose ? 'var(--red)' : dist < cur * 0.015 ? 'var(--gold)' : 'var(--green)';
+    const fillPct = Math.max(0, Math.min(100, 100 - (dist / (cur * 0.03) * 100)));
+    html += `
+      <div style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+          <span style="color:var(--text2);">SELL ${leg.strike} ${leg.optType}</span>
+          <span style="color:${color};font-family:var(--mono);">${dist.toFixed(0)} pts (${pct}%) away ${isClose?'⚠️ CLOSE!':''}</span>
+        </div>
+        <div class="distance-bar"><div class="distance-fill" style="width:${fillPct}%;background:${color};"></div></div>
+      </div>`;
+  });
+  document.getElementById('distanceContainer').innerHTML = html || '<div style="font-size:12px;color:var(--text3);">No sell legs found</div>';
+}
+
+function closePosition() {
+  if (!confirm('Close this position? This will remove it from tracking.')) return;
+  state.openPosition = null;
+  saveToStorage();
+  renderPositionTracker();
+  showToast('Position closed');
+}
+
+// ═══════════════════════════════════════
+// AI ANALYSIS
+// ═══════════════════════════════════════
+function checkApiKeyStatus() {
+  const key = state.settings.apiKey;
+  const warn = document.getElementById('apiKeyWarning');
+  const status = document.getElementById('apiKeyStatus');
+  if (!key) {
+    if (warn) warn.style.display = 'flex';
+    if (status) status.textContent = '❌ No API key configured';
+  } else {
+    if (warn) warn.style.display = 'none';
+    if (status) status.textContent = `✅ API key configured (${key.slice(0,12)}...)`;
+  }
+}
+
+function buildSystemPrompt() {
+  const a = state.lastAnalysis;
+  const base = `You are an expert NSE Nifty 50 options trading assistant for Juli, a trader in Dubai (GST = UTC+4, IST = UTC+5:30).
+
+TRADER PROFILE:
+- Broker: SBI Securities + Sensibull
+- Index: Nifty 50 only, Lot size: 65 shares
+- Portfolio: ₹30.41L (protect above VIX 20)
+- Mode: ${state.settings.paperMode ? 'Paper trading' : 'LIVE trading'}
+- Learning phase — be educational and clear
+
+CRITICAL RULES (never break):
+- Never enter before 9:00 AM Dubai (10:30 AM IST)
+- Never buy options when VIX > 17
+- Never pay > ₹150 per strangle leg
+- Never sell ITM options (Sensibull must show "GET" not "PAY")
+- Always exit at 50% profit
+- Always use 2x credit as stop loss
+- PP: buy when VIX LOW (< 16) — OPPOSITE to income trades
+
+STRATEGY MATRIX:
+VIX < 14: Long Strangle (buy aggressively, both legs < ₹120)
+VIX 14-16: Long Strangle (normally, both legs < ₹150)
+VIX 16-18: Iron Condor (sell premium — core strategy)
+VIX 18-20: Bull Put Spread (caution, defined risk only)
+VIX > 20: SKIP income trade + URGENT protective put
+
+PAPER TRADE HISTORY (all-time net: +₹3,796):
+- May 12: Long Strangle → +₹4,599 (won despite 7:58AM entry)
+- May 13: Long Strangle → -₹9,435 (VIX 19, PE @ ₹311 — mistake)
+- May 19: Long Strangle → +₹5,853 (both legs expired ITM!)
+- May 20: Iron Condor → +₹3,200 (first correct IC, 10:22AM IST)
+
+Always show times in BOTH Dubai GST AND IST.
+Be concise, use ₹ for amounts, and always end with actionable next steps.`;
+
+  if (a) {
+    return base + `\n\nCURRENT SESSION DATA:\nNifty: ${a.nifty} | VIX: ${a.vix} | Time: ${new Date().toLocaleTimeString()}\nStrategy selected: ${a.strategy} | Expiry: ${a.expiry}`;
+  }
+  return base;
+}
+
+function quickPrompt(type) {
+  const a = state.lastAnalysis;
+  const nifty = a?.nifty || document.getElementById('niftyInput').value || '(enter Nifty)';
+  const vix   = a?.vix   || document.getElementById('vixInput').value   || '(enter VIX)';
+
+  const prompts = {
+    go_nogo:    `Nifty is ${nifty}, VIX is ${vix}. Current time: ${new Date().toLocaleTimeString()}. Give me a GO/NO-GO decision for today's income trade. Check all 4 gates (time, gap, expiry, VIX direction) and give a final verdict.`,
+    strikes:    `Nifty is ${nifty}, VIX is ${vix}. Calculate exact strikes for the recommended strategy. Show all 4 legs with estimated prices. Verify breakevens are >1.5% away from current Nifty.`,
+    pp_check:   `VIX is ${vix}. Should I buy a Protective Put for my ₹30.41L portfolio now? Give me the signal (BEST/GOOD/ACCEPTABLE/WAIT/URGENT) and the exact setup if buying.`,
+    exit_check: `I have an open position (check my trade card). Current P&L is ₹(enter P&L). Should I exit now? Check 50% profit target and stop loss rules.`,
+    vix_analysis:`VIX is ${vix}. Analyze: 1) Direction signal, 2) Which strategy is best, 3) PP opportunity, 4) Risk level today. Keep it brief.`,
+    weekly_plan: `Based on current Nifty ${nifty} and VIX ${vix}, give me a 3-day trading plan for this week. Include what to watch for each day and when to potentially adjust.`
+  };
+  const q = document.getElementById('aiQuestion');
+  q.value = prompts[type] || '';
+  switchTab('ai');
+  q.focus();
+}
+
+async function askClaude() {
+  const key = state.settings.apiKey;
+  if (!key) {
+    document.getElementById('apiKeyWarning').style.display = 'flex';
+    showToast('Add API key in Settings first', 'warn');
+    return;
+  }
+
+  const question = document.getElementById('aiQuestion').value.trim();
+  if (!question) { showToast('Enter a question first', 'warn'); return; }
+
+  document.getElementById('aiThinking').style.display = 'block';
+  document.getElementById('aiResponseContainer').style.display = 'none';
+  document.getElementById('aiBtn').disabled = true;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: state.settings.aiModel || 'claude-sonnet-4-20250514',
+        max_tokens: 2048,
+        system: buildSystemPrompt(),
+        messages: [{ role: 'user', content: question }]
+      }),
+      signal: AbortSignal.timeout(30000)
+    });
+
+    const data = await resp.json();
+    if (data.error) {
+      document.getElementById('aiResponse').textContent = `❌ API Error: ${data.error.message}`;
+    } else {
+      const text = data.content?.filter(b=>b.type==='text').map(b=>b.text).join('\n\n') || '(no response)';
+      document.getElementById('aiResponse').textContent = text;
+    }
+    document.getElementById('aiResponseContainer').style.display = 'block';
+  } catch(e) {
+    document.getElementById('aiResponse').textContent = `❌ Error: ${e.message}\n\nCheck your API key and internet connection.`;
+    document.getElementById('aiResponseContainer').style.display = 'block';
+  }
+
+  document.getElementById('aiThinking').style.display = 'none';
+  document.getElementById('aiBtn').disabled = false;
+}
+
+function copyAiResponse() {
+  const text = document.getElementById('aiResponse').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied!')).catch(()=>alert(text));
+}
+
+function clearAiResponse() {
+  document.getElementById('aiResponseContainer').style.display = 'none';
+  document.getElementById('aiQuestion').value = '';
+}
+
+// ═══════════════════════════════════════
+// JOURNAL
+// ═══════════════════════════════════════
+function renderHistorical() {
+  const el = document.getElementById('historicalTrades');
+  if (!el) return;
+  el.innerHTML = HISTORICAL.map(t => `
+    <div class="trade-entry">
+      <div class="trade-entry-header">
+        <div>
+          <div class="trade-entry-date">${t.date}</div>
+          <div class="trade-entry-strategy">${t.strategy}</div>
+        </div>
+        <div class="trade-entry-pnl ${t.pnl >= 0 ? 'pnl-pos' : 'pnl-neg'}">${t.pnl >= 0 ? '+' : ''}₹${Math.abs(t.pnl).toLocaleString('en-IN')}</div>
+      </div>
+      <div class="trade-entry-meta">
+        <span class="tag ${t.pnl>=0?'tag-green':'tag-red'}">${t.pnl>=0?'WIN':'LOSS'}</span>
+        <span class="tag tag-gold">VIX ${t.entryVix}</span>
+        <span class="tag tag-accent">📚 Paper</span>
+      </div>
+      <div class="trade-entry-notes">${t.notes}</div>
+      <div style="font-size:10px;margin-top:6px;color:var(--accent);font-weight:700;">💡 ${t.lesson}</div>
+    </div>`).join('');
+}
+
+function updateJournalStats() {
+  const all = [...HISTORICAL, ...state.trades];
+  const closed = all.filter(t => t.pnl !== null && t.pnl !== undefined && t.pnl !== '');
+  const net  = closed.reduce((s,t) => s + parseFloat(t.pnl||0), 0);
+  const wins = closed.filter(t => parseFloat(t.pnl||0) > 0);
+  const best = closed.length ? Math.max(...closed.map(t=>parseFloat(t.pnl||0))) : 0;
+
+  document.getElementById('jTotalTrades').textContent = all.length;
+  const netEl = document.getElementById('jNetPnl');
+  netEl.textContent = `${net>=0?'+':''}₹${Math.abs(net).toLocaleString('en-IN')}`;
+  netEl.className = `stat-value ${net>=0?'green':'red'}`;
+  document.getElementById('jWinRate').textContent = closed.length ? `${Math.round(wins.length/closed.length*100)}%` : '--%';
+  document.getElementById('jBestTrade').textContent = `₹${best.toLocaleString('en-IN')}`;
+
+  renderJournalList();
+}
+
+function renderJournalList() {
+  const el = document.getElementById('journalList');
+  if (state.trades.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📓</div><div class="empty-text">No trades logged yet<br>Hit "Log New Trade" to start tracking!</div></div>`;
+    return;
+  }
+  el.innerHTML = [...state.trades].reverse().map((t, i) => {
+    const pnl = t.pnl !== null && t.pnl !== '' ? parseFloat(t.pnl) : null;
+    const pnlStr = pnl === null ? '<span class="pnl-open">OPEN</span>' : `<span class="${pnl>=0?'pnl-pos':'pnl-neg'}">${pnl>=0?'+':''}₹${Math.abs(pnl).toLocaleString('en-IN')}</span>`;
+    const idx = state.trades.length - 1 - i;
+    return `<div class="trade-entry">
+      <div class="trade-entry-header">
+        <div>
+          <div class="trade-entry-date">${t.date}</div>
+          <div class="trade-entry-strategy">${t.strategy}</div>
+        </div>
+        <div class="trade-entry-pnl">${pnlStr}</div>
+      </div>
+      <div class="trade-entry-meta">
+        ${pnl!==null?`<span class="tag ${pnl>=0?'tag-green':'tag-red'}">${pnl>=0?'WIN':'LOSS'}</span>`:'<span class="tag tag-gold">OPEN</span>'}
+        ${t.entryVix?`<span class="tag tag-accent">VIX ${t.entryVix}</span>`:''}
+        ${state.settings.paperMode?'<span class="tag tag-purple">📄 Paper</span>':'<span class="tag tag-red">💰 LIVE</span>'}
+        <button onclick="deleteTrade(${idx})" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;margin-left:auto;">🗑️</button>
+      </div>
+      ${t.notes?`<div class="trade-entry-notes">${t.notes}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function openAddTrade() {
+  const a = state.lastAnalysis;
+  if (a) {
+    document.getElementById('tradeEntryNifty').value = a.nifty || '';
+    document.getElementById('tradeEntryVix').value   = a.vix   || '';
+    const stratMap = { iron_condor:'Iron Condor', long_strangle:'Long Strangle', bull_put_spread:'Bull Put Spread' };
+    if (a.strategy && stratMap[a.strategy]) {
+      const sel = document.getElementById('tradeStrategy');
+      sel.value = stratMap[a.strategy];
+    }
+    if (a.expiry) document.getElementById('tradeExpiry').value = a.expiry;
+  }
+  document.getElementById('modalOverlay').style.display = 'block';
+  setDefaultDate();
+}
+
+function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+
+function saveTrade() {
+  const trade = {
+    date:        document.getElementById('tradeDate').value,
+    strategy:    document.getElementById('tradeStrategy').value,
+    entryNifty:  parseFloat(document.getElementById('tradeEntryNifty').value) || null,
+    entryVix:    parseFloat(document.getElementById('tradeEntryVix').value)   || null,
+    credit:      parseFloat(document.getElementById('tradeCredit').value)     || null,
+    expiry:      document.getElementById('tradeExpiry').value,
+    pnl:         document.getElementById('tradePnl').value !== '' ? parseFloat(document.getElementById('tradePnl').value) : null,
+    notes:       document.getElementById('tradeNotes').value.trim(),
+    timestamp:   Date.now()
+  };
+  if (!trade.date || !trade.strategy) { showToast('Date and strategy required', 'warn'); return; }
+  state.trades.push(trade);
+  saveToStorage();
+  updateJournalStats();
+  closeModal();
+  showToast('Trade saved!');
+  // Clear form
+  ['tradeEntryNifty','tradeEntryVix','tradeCredit','tradePnl','tradeNotes'].forEach(id => { document.getElementById(id).value = ''; });
+}
+
+function deleteTrade(idx) {
+  if (!confirm('Delete this trade?')) return;
+  state.trades.splice(idx, 1);
+  saveToStorage();
+  updateJournalStats();
+  showToast('Trade deleted');
+}
+
+// ═══════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════
+function saveSettings() {
+  state.settings = {
+    apiKey:    document.getElementById('apiKey')?.value || '',
+    aiModel:   document.getElementById('aiModel')?.value || 'claude-sonnet-4-20250514',
+    lotSize:   parseInt(document.getElementById('settingLot')?.value) || 65,
+    portfolio: parseInt(document.getElementById('settingPortfolio')?.value) || 3041058,
+    wingWidth: parseInt(document.getElementById('settingWing')?.value) || 500,
+    paperMode: document.getElementById('paperMode')?.checked ?? true
+  };
+  // Update UI
+  const pill = document.getElementById('modePill');
+  if (pill) pill.textContent = state.settings.paperMode ? '📄 PAPER' : '💰 LIVE';
+  if (state.settings.lotSize) document.getElementById('lotSize').value = state.settings.lotSize;
+  saveToStorage();
+  checkApiKeyStatus();
+}
+
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('nt_settings') || '{}');
+    if (s.apiKey    !== undefined) { document.getElementById('apiKey').value          = s.apiKey; state.settings.apiKey = s.apiKey; }
+    if (s.aiModel   !== undefined) { document.getElementById('aiModel').value         = s.aiModel; state.settings.aiModel = s.aiModel; }
+    if (s.lotSize   !== undefined) { document.getElementById('settingLot').value      = s.lotSize; state.settings.lotSize = s.lotSize; document.getElementById('lotSize').value = s.lotSize; }
+    if (s.portfolio !== undefined) { document.getElementById('settingPortfolio').value = s.portfolio; state.settings.portfolio = s.portfolio; }
+    if (s.wingWidth !== undefined) { document.getElementById('settingWing').value     = s.wingWidth; state.settings.wingWidth = s.wingWidth; }
+    if (s.paperMode !== undefined) { document.getElementById('paperMode').checked     = s.paperMode; state.settings.paperMode = s.paperMode; }
+    const pill = document.getElementById('modePill');
+    if (pill) pill.textContent = state.settings.paperMode ? '📄 PAPER' : '💰 LIVE';
+  } catch(e) { console.log('Settings load error:', e); }
+}
+
+// ═══════════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════════
+function saveToStorage() {
+  try {
+    localStorage.setItem('nt_trades',   JSON.stringify(state.trades));
+    localStorage.setItem('nt_settings', JSON.stringify(state.settings));
+    if (state.openPosition) localStorage.setItem('nt_position', JSON.stringify(state.openPosition));
+    else localStorage.removeItem('nt_position');
+  } catch(e) { console.log('Storage error:', e); }
+}
+
+function loadTrades() {
+  try {
+    state.trades = JSON.parse(localStorage.getItem('nt_trades') || '[]');
+    const pos = localStorage.getItem('nt_position');
+    if (pos) { state.openPosition = JSON.parse(pos); renderPositionTracker(); }
+  } catch(e) { state.trades = []; }
+}
+
+function exportData() {
+  const all = [...HISTORICAL, ...state.trades];
+  const csv = ['Date,Strategy,Entry Nifty,Entry VIX,Credit/Debit,P&L,Notes',
+    ...all.map(t => `${t.date},${t.strategy},${t.entryNifty||''},${t.entryVix||''},${t.credit||''},${t.pnl||''},"${(t.notes||'').replace(/"/g,'""')}"`)
+  ].join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `niftytrader_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  showToast('CSV exported!');
+}
+
+function clearAllData() {
+  if (!confirm('Clear ALL saved trades and settings? This cannot be undone.')) return;
+  localStorage.clear();
+  state.trades = [];
+  state.openPosition = null;
+  updateJournalStats();
+  renderPositionTracker();
+  showToast('All data cleared');
+}
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+function showToast(msg, type='success') {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+      padding:10px 20px;border-radius:24px;font-size:13px;font-weight:700;z-index:999;
+      transition:opacity 0.3s;font-family:var(--sans);box-shadow:0 4px 20px rgba(0,0,0,0.4);`;
+    document.body.appendChild(t);
+  }
+  const colors = { success:'background:var(--green);color:#0a0f1e;', warn:'background:var(--gold);color:#0a0f1e;', error:'background:var(--red);color:white;' };
+  t.style.cssText += colors[type] || colors.success;
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity='0'; }, 2500);
+}
+
+// ═══════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════
+document.addEventListener('DOMContentLoaded', init);
+
+// PWA install prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show install button in settings
+  const settingsCard = document.querySelector('#page-settings .card:last-of-type .row');
+  if (settingsCard) {
+    const installBtn = document.createElement('button');
+    installBtn.className = 'btn btn-purple btn-sm';
+    installBtn.textContent = '📲 Install App';
+    installBtn.onclick = () => { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; }); };
+    settingsCard.prepend(installBtn);
+  }
+});
+
+</script>
+</body>
+</html>
