@@ -1204,8 +1204,8 @@ function startClock() {
 
 function getMarketTimes() {
   const now = new Date();
-  const dubaiMs = now.getTime() + (4 * 60 - now.getTimezoneOffset()) * 60000;
-  const istMs   = now.getTime() + (5.5 * 60 - now.getTimezoneOffset()) * 60000;
+  const dubaiMs = now.getTime() + 4 * 3600000;
+  const istMs   = now.getTime() + 5.5 * 3600000;
   const dubaiDate = new Date(dubaiMs);
   const istDate   = new Date(istMs);
   const dubaiH = dubaiDate.getUTCHours();
@@ -1761,8 +1761,8 @@ function renderTradeCard(calc, strategy, nifty, vix, expiry, lotSize) {
   const today = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
   const { dubaiH, dubaiM, istH, istM } = (() => {
     const now = new Date();
-    const dubaiMs = now.getTime() + (4*60 - now.getTimezoneOffset())*60000;
-    const istMs   = now.getTime() + (5.5*60 - now.getTimezoneOffset())*60000;
+    const dubaiMs = now.getTime() + 4 * 3600000;
+    const istMs   = now.getTime() + 5.5 * 3600000;
     const d = new Date(dubaiMs), i = new Date(istMs);
     return { dubaiH:d.getUTCHours(), dubaiM:d.getUTCMinutes(), istH:i.getUTCHours(), istM:i.getUTCMinutes() };
   })();
@@ -1878,7 +1878,7 @@ const ROUTINE = [
 function buildRoutine() {
   const { dubaiH, dubaiM } = (() => {
     const now = new Date();
-    const d = new Date(now.getTime() + (4*60 - now.getTimezoneOffset())*60000);
+    const d = new Date(now.getTime() + 4 * 3600000);
     return { dubaiH: d.getUTCHours(), dubaiM: d.getUTCMinutes() };
   })();
   const currentMins = dubaiH * 60 + dubaiM;
@@ -1914,7 +1914,7 @@ function renderRoutineCard() {
   if (target) {
     const { dubaiH, dubaiM } = (() => {
       const now = new Date();
-      const d = new Date(now.getTime() + (4*60 - now.getTimezoneOffset())*60000);
+      const d = new Date(now.getTime() + 4 * 3600000);
       return { dubaiH: d.getUTCHours(), dubaiM: d.getUTCMinutes() };
     })();
     const currentMins = dubaiH * 60 + dubaiM;
