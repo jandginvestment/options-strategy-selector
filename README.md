@@ -1,7 +1,7 @@
 # NiftyTrader — Options Strategy Selector
 
-> **Juli's personal NSE Nifty 50 options strategy selector & trade manager**
-> Built for daily pre-market analysis from Dubai (GST) → IST conversion included.
+> **xyz's personal NSE Nifty 50 options strategy selector & trade manager**
+> Built for daily pre-market analysis from xyz → IST conversion included.
 
 ---
 
@@ -15,7 +15,8 @@
 - 📓 **Trade Journal** — Log trades, track win rate, export CSV
 - 📚 **References** — In-app strategy guides + daily routine
 - 🌐 **Live Data Fetch** — Yahoo Finance / NSE / Claude web search
-- 📱 **PWA** — Installable on Android tablet (Add to Home Screen)
+- 📱 **Native Kotlin App** — Fully native Android application
+- 🚀 **Railway API** — Dedicated Python FastAPI backend
 
 ---
 
@@ -33,7 +34,7 @@
 
 ## Trading Rules (Hard-Coded)
 
-- ❌ Never enter before 9:00 AM Dubai (10:30 AM IST)
+- ❌ Never enter before 9:00 AM xyz (10:30 AM IST)
 - ❌ Never buy options when VIX > 17
 - ❌ Never pay > ₹150 per strangle leg
 - ❌ Never hold positions into weekend
@@ -57,21 +58,17 @@
 
 ## Setup
 
-No installation needed — pure HTML/JS/CSS single file.
+The system consists of two parts: a Python backend and a Kotlin Android app.
 
-1. Open `index.html` in Chrome/Edge
-2. Enter VIX + Nifty → hit **Analyze Setup**
-3. Get trade card + gate checks instantly
+### 1. Railway API (Backend)
+1. Deploy the `server/` directory to Railway
+2. It auto-fetches Nifty + VIX + prevClose
+3. Provides `/market` and `/history` endpoints
 
-### Android Tablet (PWA Install)
-1. Open in Chrome → tap 3-dot menu
-2. Select **"Add to Home Screen"**
-3. Launches as standalone app, works offline
-
-### Claude AI Integration
-1. Go to **Settings** tab
-2. Enter your Anthropic API key (`sk-ant-...`)
-3. Use the **AI tab** for custom analysis
+### 2. Android Tablet App (Frontend)
+1. Open `android-kotlin/` in Android Studio
+2. Ensure `API_BASE_URL` in `build.gradle.kts` matches your Railway URL
+3. Build APK and install on tablet
 
 ---
 
@@ -79,25 +76,24 @@ No installation needed — pure HTML/JS/CSS single file.
 
 ```
 optionSelector/
-├── index.html          ← Full app (single file)
-├── manifest.json       ← PWA manifest
-└── references/
-    ├── iron-condor.md
-    ├── long-strangle.md
-    ├── bull-put-spread.md
-    └── protective-put.md
+├── server/             ← Python FastAPI backend (Railway)
+│   ├── main.py
+│   └── requirements.txt
+├── android-kotlin/     ← Native Android app (Jetpack Compose)
+│   └── app/src/main/
+└── index.html          ← Legacy web version backup
 ```
 
 ---
 
 ## Trader Profile
 
-- **Broker:** SBI Securities + Sensibull
+- **Broker:** xyz + Sensibull
 - **Index:** Nifty 50 only | Lot size: 65 shares
-- **Portfolio:** ₹30.41L
-- **Location:** Dubai, UAE (GST = IST − 1.5 hours)
+- **Portfolio:** xyz
+- **Location:** xyz (xyz = IST − 1.5 hours)
 - **Mode:** Paper trading → live after consistency
 
 ---
 
-*Built with ❤️ for Juli's daily trading routine*
+*Built with ❤️ for xyz's daily trading routine*
