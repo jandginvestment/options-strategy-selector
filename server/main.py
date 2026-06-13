@@ -123,16 +123,23 @@ def fetch_market_data() -> dict:
     """Fetches Nifty 50 + India VIX from Yahoo Finance via yfinance."""
     log.info("Fetching market data from Yahoo Finance...")
 
-    # Fetch both tickers in one call
-    tickers = yf.Tickers("^NSEI ^INDIAVIX")
-
-    nifty_info = tickers.tickers["^NSEI"].fast_info
-    vix_info   = tickers.tickers["^INDIAVIX"].fast_info
-
-    nifty     = round(float(nifty_info.last_price), 2)
-    prev_close= round(float(nifty_info.previous_close), 2)
-    vix       = round(float(vix_info.last_price), 2)
-    gap_pct   = round((nifty - prev_close) / prev_close * 100, 2)
+    try:
+        # history() is much more stable than fast_info when markets are closed (weekends)
+        n_hist = yf.Ticker("^NSEI").history(period="5d")
+        v_hist = yf.Ticker("^INDIAVIX").history(period="2d")
+        nifty = round(float(n_hist['Close'].iloc[-1]), 2)
+        prev_close = round(float(n_hist['Close'].iloc[-2]), 2)
+        vix = round(float(v_hist['Close'].iloc[-1]), 2)
+        gap_pct = round((nifty - prev_close) / prev_close * 100, 2) if prev_close else 0.0
+    except Exception as e:
+        log.warning(f"History fetch failed: {e}. Trying fast_info fallback...")
+        tickers = yf.Tickers("^NSEI ^INDIAVIX")
+        nifty_info = tickers.tickers["^NSEI"].fast_info
+        vix_info   = tickers.tickers["^INDIAVIX"].fast_info
+        nifty     = round(float(nifty_info.last_price), 2)
+        prev_close= round(float(nifty_info.previous_close), 2)
+        vix       = round(float(vix_info.last_price), 2)
+        gap_pct   = round((nifty - prev_close) / prev_close * 100, 2) if prev_close else 0.0
 
     log.info(f"Nifty={nifty} VIX={vix} PrevClose={prev_close} Gap={gap_pct}%")
     return {

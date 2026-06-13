@@ -18,7 +18,7 @@ android {
         versionName = "1.0"
 
         // Railway API base URL — update after Railway deployment
-        buildConfigField("String", "API_BASE_URL", "\"https://niftytrader-api.up.railway.app/\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://options-strategy-selector-production.up.railway.app/\"")
     }
 
     buildTypes {
