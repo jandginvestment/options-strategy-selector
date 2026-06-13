@@ -237,6 +237,8 @@ def market():
                 "cached": False,
             }
         except Exception as e:
+            if get_market_phase() == "weekend":
+                return {"error": "weekend", "message": "Weekend — Market is closed."}
             return {"error": str(e), "message": "Market data unavailable. NSE may be closed."}
 
     # Always refresh the live fields
